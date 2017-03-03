@@ -1,0 +1,63 @@
+Plant:
+    '@startuml'  (classes+=Class |  packages+=Package | relations+=Relation)* '@enduml'
+;
+
+Relation:
+    Reference
+;
+
+Reference:
+    contient=[Class] '*--' reference=[Class]
+    |
+    contient=[Class] '--*' reference=[Class]
+;
+
+Class:
+    type=Class_type
+    name = ID
+    '{'
+            attributes*= Attribute
+    '}'
+;
+
+Attribute:
+    Method|Value
+;
+
+Class_type:
+	'class' | 'abstract class' | 'interface'
+;
+
+Value:
+	(visibility=Visibility)?
+	name=ID
+;
+
+Method:
+	(visibility=Visibility)?
+	name=ID
+	'()'
+;
+
+Visibility:
+    '+' | '-'
+;
+
+Enum:
+  '[' values+=ID[','] ']'
+;
+
+Package:
+    'package'
+    path*=ID['.']
+    (
+    '{'
+		(
+			( classes+=Class )
+		|
+			( package+=Package )
+		)*
+	'}'
+	)?
+
+;

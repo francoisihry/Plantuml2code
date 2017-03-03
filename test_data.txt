@@ -1,0 +1,17 @@
+@startuml
+class qs5d{}
+abstract class abstract_cl{
+    + hey
+    + baaahahh()
+    - sdfsdf
+    - sdsdsd
+    + fsdf()
+    - dfffd
+
+}
+package path.to.my.package{
+    class class_inside_package{
+    }
+}
+class_inside_package *-- abstract_cl
+@enduml
