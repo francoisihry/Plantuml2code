@@ -15,9 +15,11 @@ Reference:
 Class:
     type=Class_type
     name = ID
-    '{'
-            attributes*= Attribute
-    '}'
+    (
+        '{'
+                attributes*= Attribute
+        '}'
+    )?
 ;
 
 Attribute:
@@ -55,7 +57,7 @@ Package:
 		(
 			( classes+=Class )
 		|
-			( package+=Package )
+			( packages+=Package )
 		)*
 	'}'
 	)?

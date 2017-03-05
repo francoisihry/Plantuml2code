@@ -4,7 +4,7 @@ from textx.metamodel import metamodel_from_file
 from os.path import join, dirname
 
 DEBUG = False
-mm_plant = metamodel_from_file(join(dirname(__file__) , 'meta_model.tx'), debug=DEBUG)
+mm_plant = metamodel_from_file(join(dirname(__file__) , 'plant_uml_grammar.tx'), debug=DEBUG)
 
 
 def debug(str):
