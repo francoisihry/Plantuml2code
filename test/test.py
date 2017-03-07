@@ -32,6 +32,9 @@ class TestPlantUmlGrammar(unittest.TestCase):
         attr2 = class_A.attributes[1]
         self.assertTrue(attr2, self.names_spaces['Method'])
 
+        class_B = plant_uml_model.classes[2]
+        self.assertEqual(class_A.name, "B")
+
     def test_packages(self):
         plant = """
         @startuml
