@@ -3,38 +3,47 @@ from textx.metamodel import metamodel_from_file
 from os.path import join, dirname
 
 
-
-plant1 ="""
-@startuml
-class qs5d
-abstract class abstract_cl{
-    - hey
-    + baaahahh()
-
-}
-package path.to.my.package{
-    class class_inside_package{
-    }
-}
-class_inside_package *-- abstract_cl
-@enduml
-"""
 class TestPlantUmlGrammar(unittest.TestCase):
     def setUp(self):
         self.meta_model = metamodel_from_file(join(dirname(__file__) , '../plant_uml_grammar.tx'))
+        self.names_spaces = self.meta_model.namespaces['plant_uml_grammar']
+
+
+    def test_classes(self):
+        plant = """
+        @startuml
+        class A {
+            + attr1
+            - func1()
+        }
+        class B
+        @enduml"""
+        plant_uml_model = self.meta_model.model_from_str(plant)
+
+        self.assertEqual(len(plant_uml_model.classes),2)
+        class_A = plant_uml_model.classes[0]
+        self.assertTrue(isinstance(class_A,self.names_spaces['Class']))
+        self.assertEqual(class_A.name,"A")
+        self.assertEqual(len(class_A.attributes),2)
+
+        attr1 = class_A.attributes[0]
+        self.assertTrue(attr1, self.names_spaces['Value'])
+
+        attr2 = class_A.attributes[1]
+        self.assertTrue(attr2, self.names_spaces['Method'])
 
     def test_packages(self):
         plant = """
-@startuml
-package a_simple_package{}
-package path.to.my.package1{
-    class class_inside_package
-}
+        @startuml
+        package a_simple_package{}
+        package path.to.my.package1{
+            class class_inside_package
+        }
 
-package another.package{
-    package inside.pack{}
-}
-@enduml"""
+        package another.package{
+            package inside.pack{}
+        }
+        @enduml"""
         plant_uml_model = self.meta_model.model_from_str(plant)
         packages = plant_uml_model.packages
         self.assertEqual(len(packages),3)

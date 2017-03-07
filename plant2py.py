@@ -12,7 +12,6 @@ def debug(str):
         print(str)
 
 if __name__ == "__main__" :
-    print(len(sys.argv))
     if len(sys.argv) != 2:
         print ("Please enter the plant_uml file path as parameter: \n"
                "./plant2py <plant_um file path>")
