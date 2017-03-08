@@ -7,4 +7,10 @@ package path.to.my.package1{
 package another.package{
     package inside.pack{}
 }
+
+class Point{
+    - x
+    - y
+    + get_middle()
+}
 @enduml

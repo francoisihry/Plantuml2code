@@ -1,4 +1,4 @@
-
+from enum   import Enum
 class SmartModel:
     def __init__(self, classes=[], packages=[]):
         self._classes = classes
@@ -18,11 +18,12 @@ class SmartModel:
     def add_package(self, p):
         self._packages.append(p)
 
-Accessibility = ["public", "private", "protected", "static"]
+Accessibility = Enum("Accessibility",["public", "private", "protected", "static"])
 
+pass
 class Class:
     def __init__(self, name,
-                 accessibility = "public",
+                 accessibility = Accessibility.public,
                  path = [],
                  attributes = [],
                  methods = [],
