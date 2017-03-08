@@ -1,3 +1,5 @@
+from smart_model.smart_model import SmartModel
+
 class Plant2Smart:
     def __init__(self, plant):
         self._plant = plant
