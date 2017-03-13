@@ -8,22 +8,32 @@ class Plant2Smart:
         self._names_spaces = names_spaces
         self._smart_model = SmartModel()
 
-    def parse(self):
+        self._classes= []
+
+        self._parse()
+
+    @property
+    def classes(self):
+        return self._classes
+
+    def _parse(self):
 
         for c in self._plant.classes:
-            new_class = self._create_class(c)
-            pass
+            self._classes.append(self._create_class(c))
+
 
 
 
     def _create_class(self, c):
         attributes = []
         for at in c.attributes:
-             if isinstance(at,self._names_spaces['Value']):
-                 attributes.append(Attribute(at.name,
-                                             accessibility=self._parse_accessibility(at.visibility)))
-             else:
-                 attributes.append(Method())
+            name = at.name
+            accesibility = self._parse_accessibility(at.visibility)
+            if isinstance(at,self._names_spaces['Value']):
+                attributes.append(Attribute(name,
+                                         accessibility=accesibility))
+            else:
+                attributes.append(Method(name, accessibility=accesibility))
 
 
         return Class(c.name,

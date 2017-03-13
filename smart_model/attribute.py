@@ -14,5 +14,5 @@ class Parameter:
 class Method(Attribute):
     def __init__(self,name, type = None, accessibility = Accessibility.public,
                  parameters=[]):
-        Attribute.__init__(name, type, accessibility)
+        Attribute.__init__(self, name, type, accessibility)
         self._parameters = parameters
