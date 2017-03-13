@@ -29,7 +29,7 @@ class Plant2Smart:
         for at in c.attributes:
             name = at.name
             accesibility = self._parse_accessibility(at.visibility)
-            if isinstance(at,self._names_spaces['Value']):
+            if isinstance(at, self._names_spaces['Value']):
                 attributes.append(Attribute(name,
                                          accessibility=accesibility))
             else:
