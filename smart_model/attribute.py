@@ -6,6 +6,18 @@ class Attribute:
         self._type = type
         self._accessibility = accessibility
 
+    @property
+    def accessibitily(self):
+        return self._accessibility
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def type(self):
+        return self._type
+
 class Parameter:
     def __init__(self, name, type = Accessibility.public):
         self._name = name
@@ -16,3 +28,7 @@ class Method(Attribute):
                  parameters=[]):
         Attribute.__init__(self, name, type, accessibility)
         self._parameters = parameters
+
+    @property
+    def parameters(self):
+        return  self._parameters

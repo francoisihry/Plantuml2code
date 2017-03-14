@@ -18,9 +18,18 @@ class SmartModel:
     def add_package(self, p):
         self._packages.append(p)
 
+    @property
+    def packages(self):
+        return self._packages
+
+    @property
+    def classes(self):
+        return self._classes
+
+
 Accessibility = Enum("Accessibility",["public", "private", "protected", "static"])
 
-pass
+
 class Class:
     def __init__(self, name,
                  accessibility = Accessibility.public,
