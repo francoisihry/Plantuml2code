@@ -49,4 +49,11 @@ class TestPlantUmlParsing(unittest.TestCase):
         plant_uml_model = MM_PLANT.model_from_str(plant)
         smart_model = plant2smart(plant_uml_model)
         self.assertEqual(len(smart_model.packages),3)
+        a_simple_package = smart_model.packages[0]
+        self.assertEqual(a_simple_package.path,['a_simple_package'])
+        self.assertEqual(len(a_simple_package.classes), 0)
+        package2 = smart_model.packages[1]
+        self.assertEqual(package2.path,['path', 'to', 'my', 'package1'])
+        self.assertEqual(len(package2.classes),1)
+        self.assertEqual(package2.classes[0].path, ['path', 'to', 'my', 'package1','class_inside_package'])
 

@@ -69,7 +69,7 @@ class Class:
 
     @property
     def path(self):
-        return self.path
+        return self._path
 
     @property
     def attributes(self):

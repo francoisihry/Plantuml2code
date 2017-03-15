@@ -2,6 +2,8 @@ from smart_model.smart_model import SmartModel, Class, Accessibility, Package
 from smart_model.attribute import Attribute, Method
 from textx.metamodel import metamodel_from_file
 from os.path import join, dirname
+from copy import deepcopy
+
 MM_PLANT = metamodel_from_file(join(dirname(__file__), '../plant_uml_grammar.tx'))
 NAMES_SPACES = MM_PLANT.namespaces['plant_uml_grammar']
 
@@ -18,14 +20,16 @@ def _create_package( p):
     p_classes=[]
     p_packages=[]
     for c in p.classes:
-        p_classes.append(_create_class(c))
+        class_path = deepcopy(p.path)
+        class_path.append(c.name)
+        p_classes.append(_create_class(c, class_path))
     for pack in p.packages:
         p_packages.append(_create_package(pack))
     return Package(p.path, p_classes, p_packages)
 
 
 
-def _create_class( c):
+def _create_class( c, path =[]):
     attributes = []
     for at in c.attributes:
         name = at.name
@@ -38,7 +42,8 @@ def _create_class( c):
 
 
     return Class(c.name,
-                 attributes=attributes)
+                 attributes=attributes,
+                 path = path)
 
 def _parse_accessibility(visibility):
     accessibitity = {"+":Accessibility.public,
