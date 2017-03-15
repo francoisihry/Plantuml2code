@@ -1,11 +1,9 @@
 import sys
-from textx.metamodel import metamodel_from_file
-from os.path import join, dirname
-from parsers.plant2smart import plant2smart
+
+from parsers.plant2smart import plant2smart, MM_PLANT
 
 DEBUG = False
-MM_PLANT = metamodel_from_file(join(dirname(__file__), 'plant_uml_grammar.tx'), debug=DEBUG)
-NAMES_SPACES = MM_PLANT.namespaces['plant_uml_grammar']
+
 
 
 

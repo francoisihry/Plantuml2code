@@ -1,8 +1,7 @@
 import unittest
 
-from parsers.plant2smart import plant2smart
+from parsers.plant2smart import plant2smart, MM_PLANT
 from smart_model.smart_model import Accessibility
-from plant2py  import NAMES_SPACES, MM_PLANT
 
 class TestPlantUmlParsing(unittest.TestCase):
 
@@ -49,5 +48,5 @@ class TestPlantUmlParsing(unittest.TestCase):
                 @enduml"""
         plant_uml_model = MM_PLANT.model_from_str(plant)
         smart_model = plant2smart(plant_uml_model)
-        # self.assertEqual(len(smart_model.packages),3)
+        self.assertEqual(len(smart_model.packages),3)
 

@@ -1,6 +1,9 @@
 from smart_model.smart_model import SmartModel, Class, Accessibility, Package
 from smart_model.attribute import Attribute, Method
-from plant2py import NAMES_SPACES
+from textx.metamodel import metamodel_from_file
+from os.path import join, dirname
+MM_PLANT = metamodel_from_file(join(dirname(__file__), '../plant_uml_grammar.tx'))
+NAMES_SPACES = MM_PLANT.namespaces['plant_uml_grammar']
 
 def plant2smart(plant):
     smart_model = SmartModel()
