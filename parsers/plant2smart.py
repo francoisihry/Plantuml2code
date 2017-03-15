@@ -3,6 +3,7 @@ from smart_model.attribute import Attribute, Method
 from textx.metamodel import metamodel_from_file
 from os.path import join, dirname
 from copy import deepcopy
+import re
 
 MM_PLANT = metamodel_from_file(join(dirname(__file__), '../plant_uml_grammar.tx'))
 NAMES_SPACES = MM_PLANT.namespaces['plant_uml_grammar']
@@ -16,17 +17,21 @@ def plant2smart(plant):
     return smart_model
 
 
-def _create_package( p):
+def _create_package(p, path=[]):
     p_classes=[]
     p_packages=[]
     for c in p.classes:
         class_path = deepcopy(p.path)
-        class_path.append(c.name)
-        p_classes.append(_create_class(c, class_path))
+        class_path.append(_to_snake_case(c.name))
+        p_classes.append(_create_class(c, path + class_path))
     for pack in p.packages:
-        p_packages.append(_create_package(pack))
-    return Package(p.path, p_classes, p_packages)
+        pack_path = deepcopy(p.path)
+        p_packages.append(_create_package(pack, path + pack_path))
+    return Package(path + p.path, p_classes, p_packages)
 
+def _to_snake_case(camel_case):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', camel_case)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 
 def _create_class( c, path =[]):
