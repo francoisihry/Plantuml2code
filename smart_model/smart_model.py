@@ -83,9 +83,17 @@ class Class:
     def contains(self):
         return self._contains
 
+    @contains.setter
+    def contains(self, cl):
+        self._contains = cl
+
     @property
     def contained_by(self):
         return self._contained_by
+
+    @contained_by.setter
+    def contained_by(self, cl):
+        self._contained_by = cl
 
     @property
     def reference_to(self):

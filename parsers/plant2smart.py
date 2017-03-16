@@ -14,8 +14,22 @@ def plant2smart(plant):
         smart_model.classes.append(_create_class(c))
     for p in plant.packages:
         smart_model.packages.append(_create_package(p))
+    for r in plant.relations:
+        if isinstance(r, NAMES_SPACES['Composition']):
+            _add_composition(r, smart_model)
     return smart_model
 
+def _add_composition(compo,smart_model):
+    contenu = compo.contenu[0]
+    contenant = compo.contenant[0]
+    match_contenu = [c for c in smart_model.classes if c.name == contenu.name]
+    match_contenant = [c for c in smart_model.classes if c.name == contenant.name]
+    if len(match_contenant) == 1 and len(match_contenu) == 1 :
+        match_contenant[0].contains = match_contenu[0]
+        match_contenu[0].contained_by = match_contenant[0]
+    else:
+        raise Exception("probleme soit il ne trouve pas les contenus/contenants."
+                        "Soit il en trouve plus que 1")
 
 def _create_package(p, path=[]):
     p_classes=[]

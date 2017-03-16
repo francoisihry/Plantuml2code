@@ -78,3 +78,21 @@ class TestPlantUmlParsing(unittest.TestCase):
         point = hey_pack.classes[0]
         self.assertEqual(point.path, ['another', 'package', 'inside', 'pack', 'hey', 'point'])
         self.assertEqual(another_package.packages[1].path, ['another', 'package', 'empty_package'])
+
+    def test_composition(self):
+        plant = """
+        @startuml
+        class Point{
+            - x
+            - y
+            + get_middle()
+        }
+
+        class Figure
+
+        Figure *-- Point
+        @enduml
+        """
+        plant_uml_model = MM_PLANT.model_from_str(plant)
+        smart_model = plant2smart(plant_uml_model)
+        i=0
