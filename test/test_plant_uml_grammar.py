@@ -27,10 +27,10 @@ class TestPlantUmlGrammar(unittest.TestCase):
         self.assertEqual(len(class_A.attributes),2)
 
         attr1 = class_A.attributes[0]
-        self.assertTrue(attr1, self.names_spaces['Value'])
+        self.assertTrue(isinstance(attr1, self.names_spaces['Value']))
 
         attr2 = class_A.attributes[1]
-        self.assertTrue(attr2, self.names_spaces['Method'])
+        self.assertTrue(isinstance(attr2, self.names_spaces['Method']))
 
         class_B = plant_uml_model.classes[1]
         self.assertEqual(class_B.name, "B")
@@ -63,4 +63,26 @@ class TestPlantUmlGrammar(unittest.TestCase):
         pass
 
     def test_relations(self):
-        pass
+        plant = """
+        @startuml
+        class Point{
+            - x
+            - y
+            + get_middle()
+        }
+
+        class Figure
+
+        Figure *-- Point
+        @enduml
+        """
+        plant_uml_model = self.meta_model.model_from_str(plant)
+        self.assertEqual(len(plant_uml_model.relations), 1)
+        point = plant_uml_model.classes[0]
+        compo = plant_uml_model.relations[0]
+        figure = plant_uml_model.classes[1]
+        self.assertTrue(isinstance(compo, self.names_spaces['Composition']))
+        contenu = compo.contenu[0]
+        self.assertEqual(contenu, point)
+        contenant = compo.contenant [0]
+        self.assertEqual(contenant, figure)

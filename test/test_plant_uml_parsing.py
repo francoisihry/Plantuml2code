@@ -2,6 +2,7 @@ import unittest
 
 from parsers.plant2smart import plant2smart, MM_PLANT
 from smart_model.smart_model import Accessibility
+from smart_model.attribute import Method, Attribute
 
 class TestPlantUmlParsing(unittest.TestCase):
 
@@ -22,9 +23,11 @@ class TestPlantUmlParsing(unittest.TestCase):
         self.assertEqual(len(classA.attributes), 2)
         self.assertEqual(classA.accessibility, Accessibility.public)
         attr1 = classA.attributes[0]
+        self.assertTrue(isinstance(attr1, Attribute))
         self.assertEqual(attr1.name,'attr1')
         self.assertEqual(attr1.accessibitily, Accessibility.public)
         func1 = classA.attributes[1]
+        self.assertTrue(isinstance(func1,Method))
         self.assertEqual(func1.name, 'func1')
         self.assertEqual(func1.accessibitily, Accessibility.private)
 

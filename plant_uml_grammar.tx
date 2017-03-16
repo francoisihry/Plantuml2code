@@ -3,13 +3,13 @@ Plant:
 ;
 
 Relation:
-    Reference
+    Composition
 ;
 
-Reference:
-    contient=[Class] '*--' reference=[Class]
+Composition:
+    contenant=[Class] '*--' contenu=[Class]
     |
-    contient=[Class] '--*' reference=[Class]
+    contenu=[Class] '--*' contenant=[Class]
 ;
 
 Class:
