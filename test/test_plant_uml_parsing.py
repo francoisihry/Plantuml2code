@@ -101,3 +101,32 @@ class TestPlantUmlParsing(unittest.TestCase):
         self.assertEqual(point.contained_by, figure)
         self.assertEqual(len(figure.contains),1)
         self.assertEqual(figure.contains[0], point)
+
+    def test_complex_composition(self):
+        plant = """
+                @startuml
+                package path.to.pack{
+                    package element{
+                        class Point{
+                            - x
+                            - y
+                            + get_middle()
+                        }
+                    }
+                }
+                package geo {
+                    class segment
+                }
+                class Figure
+
+                Figure *-- segment
+                Point --* segment
+                @enduml
+                """
+        plant_uml_model = MM_PLANT.model_from_str(plant)
+        smart_model = plant2smart(plant_uml_model)
+        point = smart_model.packages[0].packages[0].classes[0]
+        segment = smart_model.packages[1].classes[0]
+        figure = smart_model.classes[0]
+        self.assertIsNotNone(segment.contained_by)
+        i =0

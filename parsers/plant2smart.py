@@ -19,6 +19,7 @@ def plant2smart(plant):
             _add_composition(r, smart_model)
     return smart_model
 
+
 def _add_composition(compo,smart_model):
     contenu = compo.contenu[0]
     contenant = compo.contenant[0]
