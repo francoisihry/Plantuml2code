@@ -25,7 +25,7 @@ def _add_composition(compo,smart_model):
     match_contenu = [c for c in smart_model.classes if c.name == contenu.name]
     match_contenant = [c for c in smart_model.classes if c.name == contenant.name]
     if len(match_contenant) == 1 and len(match_contenu) == 1 :
-        match_contenant[0].contains = match_contenu[0]
+        match_contenant[0].contains.append(match_contenu[0])
         match_contenu[0].contained_by = match_contenant[0]
     else:
         raise Exception("probleme soit il ne trouve pas les contenus/contenants."

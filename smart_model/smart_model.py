@@ -51,7 +51,7 @@ class Class:
         self._methods = methods
         # Composition
         self._contains = contained_classes
-        self._contained_by =contained_by
+        self._contained_by = contained_by
         # Reference
         self._reference_to = reference_to
         self._is_referenced_by = is_referenced_by

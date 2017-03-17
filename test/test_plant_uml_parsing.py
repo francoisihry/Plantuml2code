@@ -79,7 +79,7 @@ class TestPlantUmlParsing(unittest.TestCase):
         self.assertEqual(point.path, ['another', 'package', 'inside', 'pack', 'hey', 'point'])
         self.assertEqual(another_package.packages[1].path, ['another', 'package', 'empty_package'])
 
-    def test_composition(self):
+    def test_simple_composition(self):
         plant = """
         @startuml
         class Point{
@@ -95,4 +95,9 @@ class TestPlantUmlParsing(unittest.TestCase):
         """
         plant_uml_model = MM_PLANT.model_from_str(plant)
         smart_model = plant2smart(plant_uml_model)
-        i=0
+        point = smart_model.classes[0]
+        figure = smart_model.classes[1]
+        self.assertIsNotNone(point.contained_by)
+        self.assertEqual(point.contained_by, figure)
+        self.assertEqual(len(figure.contains),1)
+        self.assertEqual(figure.contains[0], point)
