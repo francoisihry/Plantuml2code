@@ -23,14 +23,18 @@ def plant2smart(plant):
 def _add_composition(compo,smart_model):
     contenu = compo.contenu[0]
     contenant = compo.contenant[0]
-    match_contenu = [c for c in smart_model.classes if c.name == contenu.name]
-    match_contenant = [c for c in smart_model.classes if c.name == contenant.name]
+    match_contenu = smart_model.find_classes_by_name(contenu.name)
+    match_contenant = smart_model.find_classes_by_name(contenant.name)
     if len(match_contenant) == 1 and len(match_contenu) == 1 :
-        match_contenant[0].contains.append(match_contenu[0])
-        match_contenu[0].contained_by = match_contenant[0]
+        class_contenant = match_contenant[0]
+        class_contenu = match_contenu[0]
+        class_contenant.contains.append(class_contenu)
+        class_contenu.contained_by = class_contenant
+
     else:
         raise Exception("probleme soit il ne trouve pas les contenus/contenants."
                         "Soit il en trouve plus que 1")
+
 
 def _create_package(p, path=[]):
     p_classes=[]

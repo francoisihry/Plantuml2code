@@ -129,4 +129,6 @@ class TestPlantUmlParsing(unittest.TestCase):
         segment = smart_model.packages[1].classes[0]
         figure = smart_model.classes[0]
         self.assertIsNotNone(segment.contained_by)
-        i =0
+        self.assertEqual(segment.contained_by,figure)
+        self.assertEqual(figure.contains[0],segment)
+        self.assertEqual(segment.contains[0],point)

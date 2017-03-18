@@ -26,6 +26,15 @@ class SmartModel:
     def classes(self):
         return self._classes
 
+    def find_classes_by_name(self, name):
+        return self._find_classes_in_pack_by_name(self,name)
+
+    @staticmethod
+    def _find_classes_in_pack_by_name(pack, name):
+        class_list = [c for c in pack.classes if c.name == name]
+        for pack in pack.packages:
+            class_list += SmartModel._find_classes_in_pack_by_name(pack, name)
+        return class_list
 
 Accessibility = Enum("Accessibility",["public", "private", "protected", "static"])
 
@@ -33,31 +42,56 @@ Accessibility = Enum("Accessibility",["public", "private", "protected", "static"
 class Class:
     def __init__(self, name,
                  accessibility = Accessibility.public,
-                 path = [],
-                 attributes = [],
-                 methods = [],
-                 contained_classes = [],
+                 path = None,
+                 attributes = None,
+                 methods = None,
+                 contains = None,
                  contained_by = None,
-                 reference_to = [],
-                 is_referenced_by = [],
-                 herits_of = [],
-                 is_herited_by = []
+                 reference_to = None,
+                 is_referenced_by = None,
+                 herits_of = None,
+                 is_herited_by = None
                  ):
         self._name = name
         self._accessibility = accessibility
-        self._path = path
-        # Attributes
-        self._attributes = attributes
-        self._methods = methods
+        if path:
+            self._path = path
+        else:
+            self._path = []
+            # Attributes
+        if attributes:
+            self._attributes = attributes
+        else:
+            self._attributes = []
+        if methods:
+            self._methods = methods
+        else:
+            self._methods = []
         # Composition
-        self._contains = contained_classes
+        if contains:
+            self._contains = contains
+        else:
+            self._contains = []
         self._contained_by = contained_by
+
         # Reference
-        self._reference_to = reference_to
-        self._is_referenced_by = is_referenced_by
+        if reference_to:
+            self._reference_to = reference_to
+        else:
+            self._reference_to = []
+        if is_referenced_by:
+            self._is_referenced_by = is_referenced_by
+        else:
+            self._is_referenced_by = []
         # Inheritance
-        self._herits_of = herits_of
-        self._is_herited_by = is_herited_by
+        if herits_of:
+            self._herits_of = herits_of
+        else:
+            self._herits_of = []
+        if is_herited_by:
+            self._is_herited_by = is_herited_by
+        else:
+            self._is_herited_by = []
 
     @property
     def name(self):
@@ -85,7 +119,7 @@ class Class:
 
     @contains.setter
     def contains(self, cl):
-        self._contains = cl
+        self._contains.append(cl)
 
     @property
     def contained_by(self):
