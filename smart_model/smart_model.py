@@ -1,8 +1,17 @@
-from enum   import Enum
+from os.path import join
+import re
+import copy
+
 class SmartModel:
-    def __init__(self, classes=[], packages=[]):
-        self._classes = classes
-        self._packages = packages
+    def __init__(self, classes=None, packages=None):
+        if classes:
+            self._classes = classes
+        else:
+            self._classes = []
+        if packages:
+            self._packages = packages
+        else:
+            self._packages =[]
 
     @property
     def classes(self):
@@ -36,12 +45,21 @@ class SmartModel:
             class_list += SmartModel._find_classes_in_pack_by_name(pack, name)
         return class_list
 
-Accessibility = Enum("Accessibility",["public", "private", "protected", "static"])
 
+class Accessibility:
+    (public,
+     private,
+     protected,
+     static
+    ) = range(4)
+
+def _to_snake_case(camel_case):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', camel_case)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 class Class:
     def __init__(self, name,
-                 accessibility = Accessibility.public,
+                 accessibility=Accessibility.public,
                  path = None,
                  attributes = None,
                  methods = None,
@@ -53,11 +71,14 @@ class Class:
                  is_herited_by = None
                  ):
         self._name = name
+        self._file_name = name.lower()
+
         self._accessibility = accessibility
         if path:
             self._path = path
         else:
             self._path = []
+        self._path.append(_to_snake_case(self._name))
             # Attributes
         if attributes:
             self._attributes = attributes
@@ -93,9 +114,35 @@ class Class:
         else:
             self._is_herited_by = []
 
+        self._extension = ''
+
+    def __str__(self):
+        return 'Class {}'.format(self._name)
+
+    def make_file_path(self, output_path):
+        file_path = copy.deepcopy(self._path)
+        file_path[len(file_path)-1] += self._extension
+        return join(*(output_path+file_path))
+
     @property
     def name(self):
         return self._name
+
+    @property
+    def file_name(self):
+        return self._file_name
+
+    @file_name.setter
+    def file_name(self, fn):
+        self._file_name = fn
+
+    @property
+    def extension(self):
+        return self._extension
+
+    @extension.setter
+    def extension(self, ex):
+        self._extension = ex
 
     @property
     def accessibility(self):
@@ -145,15 +192,30 @@ class Class:
     def is_herited_by(self):
         return self._is_herited_by
 
+
 class Package:
-    def __init__(self, path = [], classes = [], packages = []):
-        self._path = path
-        self._classes = classes
-        self._packages = packages
+    def __init__(self, path = None, classes = None, packages = None):
+        if path:
+            self._path = path
+        else:
+            self._path = []
+        if classes:
+            self._classes = classes
+        else:
+            self._classes = []
+        if packages:
+            self._packages = packages
+        else:
+            self._packages = []
+
+    def __str__(self):
+        return 'Package {}'.format(join(*self._path))
+
 
     @property
     def path(self):
         return self._path
+
 
     @property
     def classes(self):
