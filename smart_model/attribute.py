@@ -1,4 +1,4 @@
-from smart_model import Accessibility
+from smart_model.smart_model import Accessibility
 
 class Attribute:
     def __init__(self, name, type = None, accessibility = Accessibility.public):
