@@ -1,8 +1,9 @@
 import unittest
 
-from parsers.plant2smart import plant2smart, MM_PLANT
+
 from smart_model.smart_model import Accessibility
 from smart_model.attribute import Method, Attribute
+from parsers.plant2smart import plant2smart, MM_PLANT
 
 class TestPlantUmlParsing(unittest.TestCase):
 
@@ -19,6 +20,7 @@ class TestPlantUmlParsing(unittest.TestCase):
         smart_model = plant2smart(plant_uml_model)
         self.assertEqual(len(smart_model.classes), 2)
         classA = smart_model.classes[0]
+        self.assertEqual(classA.path, ['a'])
         self.assertEqual(classA.name, 'A')
         self.assertEqual(len(classA.attributes), 2)
         self.assertEqual(classA.accessibility, Accessibility.public)
@@ -128,6 +130,7 @@ class TestPlantUmlParsing(unittest.TestCase):
         point = smart_model.packages[0].packages[0].classes[0]
         segment = smart_model.packages[1].classes[0]
         figure = smart_model.classes[0]
+        self.assertEqual(figure.name,'Figure')
         self.assertIsNotNone(segment.contained_by)
         self.assertEqual(segment.contained_by,figure)
         self.assertEqual(figure.contains[0],segment)
