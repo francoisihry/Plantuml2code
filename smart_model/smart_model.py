@@ -1,6 +1,6 @@
 from os.path import join
 import re
-import copy
+from smart_model.attribute import  Method, Accessibility
 
 class SmartModel:
     def __init__(self, classes=None, packages=None):
@@ -47,12 +47,7 @@ class SmartModel:
         return class_list
 
 
-class Accessibility:
-    (public,
-     private,
-     protected,
-     static
-    ) = range(4)
+
 
 def _to_snake_case(camel_case):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', camel_case)
@@ -80,11 +75,12 @@ class Class:
             self._attributes = attributes
         else:
             self._attributes = []
-        if methods:
-            self._methods = methods
 
-        else:
-            self._methods = []
+        self._methods = [at for at in self._attributes
+                         if isinstance(at,Method)]
+
+        self._constructors = [m for m in self._methods
+                              if m.name == self.name and m.accessibitily == Accessibility.public]
         # Composition
         if contains:
             self._contains = contains
@@ -117,6 +113,11 @@ class Class:
 
     def make_file_path(self, output_path):
         return join(*(output_path+self.path))
+
+
+    @property
+    def constructors(self):
+        return self._constructors
 
     @property
     def name(self):

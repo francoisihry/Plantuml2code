@@ -13,6 +13,7 @@ class TestPlantUmlParsing(unittest.TestCase):
                 class A {
                     + int attr1
                     - str func1(float arg, int i)
+                    + A(str name)
                 }
                 class B
                 @enduml"""
@@ -22,7 +23,8 @@ class TestPlantUmlParsing(unittest.TestCase):
         classA = smart_model.classes[0]
         self.assertEqual(classA.path, ['a'])
         self.assertEqual(classA.name, 'A')
-        self.assertEqual(len(classA.attributes), 2)
+        self.assertEqual(len(classA.attributes), 3)
+        self.assertEqual(classA.constructors[0].name,'A')
         self.assertEqual(classA.accessibility, Accessibility.public)
         attr1 = classA.attributes[0]
         self.assertTrue(isinstance(attr1, Attribute))

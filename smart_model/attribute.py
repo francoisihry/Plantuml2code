@@ -1,4 +1,9 @@
-from smart_model.smart_model import Accessibility
+class Accessibility:
+    (public,
+     private,
+     protected,
+     static
+    ) = range(4)
 
 class Attribute:
     def __init__(self, name, type = None, accessibility = Accessibility.public):
@@ -42,3 +47,5 @@ class Method(Attribute):
     @property
     def parameters(self):
         return  self._parameters
+
+
