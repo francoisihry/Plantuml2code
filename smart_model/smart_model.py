@@ -60,7 +60,6 @@ def _to_snake_case(camel_case):
 class Class:
     def __init__(self, name,
                  accessibility=Accessibility.public,
-                 path = None,
                  attributes = None,
                  methods = None,
                  contains = None,
@@ -68,17 +67,19 @@ class Class:
                  reference_to = None,
                  is_referenced_by = None,
                  herits_of = None,
-                 is_herited_by = None
+                 is_herited_by = None,
+                 pack_container = None
                  ):
         self._name = name
-        self._file_name = name.lower()
+        self._file_name = _to_snake_case(name)
 
         self._accessibility = accessibility
-        if path:
-            self._path = path
-        else:
-            self._path = []
-        self._path.append(_to_snake_case(self._name))
+        self._pack_container = pack_container
+        # if path:
+        #     self._path = path
+        # else:
+        #     self._path = []
+        # self._path.append(_to_snake_case(self._name))
             # Attributes
         if attributes:
             self._attributes = attributes
@@ -129,6 +130,14 @@ class Class:
         return self._name
 
     @property
+    def pack_container(self):
+        return self._pack_container
+
+    @pack_container.setter
+    def pack_container(self, c):
+        self._pack_container = c
+
+    @property
     def file_name(self):
         return self._file_name
 
@@ -150,7 +159,11 @@ class Class:
 
     @property
     def path(self):
-        return self._path
+        if self.pack_container:
+            path = self.pack_container.path
+        else:
+            path=[]
+        return path+[self.file_name]
 
     @property
     def attributes(self):
@@ -194,27 +207,66 @@ class Class:
 
 
 class Package:
-    def __init__(self, path = None, classes = None, packages = None):
-        if path:
-            self._path = path
+    def __init__(self, path , classes = None, packages = None, container = None):
+        self._container = container
+        self._name = path[0]
+
+        self._classes = []
+        self._packages = []
+        if len(path) == 1:
+
+            if classes:
+                for c in classes:
+                    self._add_class(c)
+            if packages:
+                for p in packages:
+                    self._add_package(p)
+            else:
+                self._packages = []
         else:
-            self._path = []
-        if classes:
-            self._classes = classes
-        else:
-            self._classes = []
-        if packages:
-            self._packages = packages
-        else:
-            self._packages = []
+            self._packages = [Package( path = [path[i] for i in range(1,len(path))],
+                                       classes=classes,
+                                       packages=packages,
+                                       container=self)
+                                  ]
+
+
 
     def __str__(self):
-        return 'Package {}'.format(join(*self._path))
+        return 'Package {}'.format(self._name)
+
+
+    def _add_class(self, c):
+        self._classes.append(c)
+        c.pack_container = self
+
+    def _add_package(self, p):
+        self._packages.append(p)
+        p.container = self
+
+
+    @property
+    def container(self):
+        return self._container
+
+    @container.setter
+    def container(self, c):
+        self._container = c
 
 
     @property
     def path(self):
-        return self._path
+        cont = self.container
+        path = []
+        while cont is not None:
+            path.insert(0, cont.name)
+            cont = cont.container
+        path.append(self._name)
+        return path
+
+    @property
+    def name(self):
+        return self._name
 
 
     @property

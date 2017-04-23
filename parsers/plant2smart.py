@@ -11,7 +11,7 @@ NAMES_SPACES = MM_PLANT.namespaces['plant_uml_grammar']
 def plant2smart(plant):
     smart_model = SmartModel()
     for c in plant.classes:
-        smart_model.classes.append(_create_class(c))
+        smart_model.classes.append(_create_class(c, None))
     for p in plant.packages:
         smart_model.packages.append(_create_package(p))
     for r in plant.relations:
@@ -36,31 +36,13 @@ def _add_composition(compo,smart_model):
                         "Soit il en trouve plus que 1")
 
 
-def _create_package(p, path=[]):
-    p_classes = []
-    p_packages = []
-    for c in p.classes:
-        class_path = deepcopy(p.path)
-        p_classes.append(_create_class(c, path + class_path))
-    for t_pack in p.packages:
-        pack_path = deepcopy(p.path)
-        p_packages.append(_create_package(t_pack, path + pack_path))
-    if len(p.path) == 1:
-        return Package(path+[p.path[0]], p_classes, p_packages)
-    else:
-        rt_pack = Package(path+[p.path[0]])
-        pack = rt_pack
-
-        for i in range(1, len(p.path)-1):
-            child_path = path+[p.path[k] for k in range(0,i+1)]
-            pack_child = Package(child_path)
-            pack.packages.append(pack_child)
-            pack=pack_child
-        pack.packages.append(Package(path+p.path, p_classes, p_packages))
-        return rt_pack
+def _create_package(p):
+    classes = [_create_class(c, p ) for c in p.classes]
+    packages = [_create_package(pack) for pack in p.packages]
+    return Package(p.path, classes, packages)
 
 
-def _create_class( c, path =[]):
+def _create_class( c, container):
     attributes = []
     for at in c.attributes:
         name = at.name
@@ -74,7 +56,7 @@ def _create_class( c, path =[]):
 
     return Class(c.name,
                  attributes=attributes,
-                 path = path)
+                 pack_container=container)
 
 def _parse_accessibility(visibility):
     accessibitity = {"+":Accessibility.public,
