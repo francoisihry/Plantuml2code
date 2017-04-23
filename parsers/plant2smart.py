@@ -1,5 +1,5 @@
 from smart_model.smart_model import SmartModel, Class, Accessibility, Package
-from smart_model.attribute import Attribute, Method
+from smart_model.attribute import Attribute, Method, Parameter
 from textx.metamodel import metamodel_from_file
 from os.path import join, dirname
 from copy import deepcopy
@@ -46,12 +46,15 @@ def _create_class( c, container):
     attributes = []
     for at in c.attributes:
         name = at.name
+        type = at.type
         accesibility =_parse_accessibility(at.visibility)
         if isinstance(at,NAMES_SPACES['Value']):
-            attributes.append(Attribute(name,
+            attributes.append(Attribute(name, type=type,
                                      accessibility=accesibility))
         else:
-            attributes.append(Method(name, accessibility=accesibility))
+            params = [Parameter(p.name, p.type) for p in at.params]
+            attributes.append(Method(name, type=type, accessibility=accesibility,
+                                     parameters=params))
 
 
     return Class(c.name,

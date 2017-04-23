@@ -11,8 +11,8 @@ class TestPlantUmlParsing(unittest.TestCase):
         plant = """
                 @startuml
                 class A {
-                    + attr1
-                    - func1()
+                    + int attr1
+                    - str func1(float arg, int i)
                 }
                 class B
                 @enduml"""
@@ -27,10 +27,17 @@ class TestPlantUmlParsing(unittest.TestCase):
         attr1 = classA.attributes[0]
         self.assertTrue(isinstance(attr1, Attribute))
         self.assertEqual(attr1.name,'attr1')
+        self.assertEqual(attr1.type, 'int')
         self.assertEqual(attr1.accessibitily, Accessibility.public)
         func1 = classA.attributes[1]
         self.assertTrue(isinstance(func1,Method))
         self.assertEqual(func1.name, 'func1')
+        self.assertEqual(func1.type, 'str')
+        self.assertEqual(len(func1.parameters), 2)
+        self.assertEqual(func1.parameters[0].type, 'float')
+        self.assertEqual(func1.parameters[0].name, 'arg')
+        self.assertEqual(func1.parameters[1].type, 'int')
+        self.assertEqual(func1.parameters[1].name, 'i')
         self.assertEqual(func1.accessibitily, Accessibility.private)
 
         classB = smart_model.classes[1]

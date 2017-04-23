@@ -13,15 +13,9 @@ class TestSmartModel(unittest.TestCase):
         self.assertEqual(str(smart_model_1.classes[0]), "Class classe_A")
         self.assertEqual(smart_model_1.classes[1].name, "classe_B")
         self.assertEqual(len(smart_model_1.packages),1)
-        self.assertEqual(smart_model_1.packages[0].path, ['path','to','my_package'])
-        self.assertEqual(len(smart_model_1.packages[0].classes), 1)
-        self.assertEqual(smart_model_1.packages[0].classes[0].name, "classe_C")
-        self.assertEqual(smart_model_1.packages[0].packages[0].path, ['empty_package'])
-
-        classes_2 = [Class("classe_D"), Class("classe_E"), Class("classe_F")]
-        smart_model_2 = SmartModel(classes_2)
-        self.assertEqual(len(smart_model_2.classes), 3)
-        self.assertEqual(smart_model_2.classes[0].name, "classe_D")
-        self.assertEqual(smart_model_2.classes[1].name, "classe_E")
-        self.assertEqual(smart_model_2.classes[2].name, "classe_F")
+        pack_path_to_my_package = smart_model_1.packages[0].packages[0].packages[0]
+        self.assertEqual(pack_path_to_my_package.path, ['path','to','my_package'])
+        self.assertEqual(len(pack_path_to_my_package.classes), 1)
+        self.assertEqual(pack_path_to_my_package.classes[0].name, "classe_C")
+        self.assertEqual(pack_path_to_my_package.packages[0].path, ['path', 'to', 'my_package','empty_package'])
 

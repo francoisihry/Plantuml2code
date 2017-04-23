@@ -76,18 +76,13 @@ class Class:
 
         self._accessibility = accessibility
         self._pack_container = pack_container
-        # if path:
-        #     self._path = path
-        # else:
-        #     self._path = []
-        # self._path.append(_to_snake_case(self._name))
-            # Attributes
         if attributes:
             self._attributes = attributes
         else:
             self._attributes = []
         if methods:
             self._methods = methods
+
         else:
             self._methods = []
         # Composition

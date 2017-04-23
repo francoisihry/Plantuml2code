@@ -29,21 +29,35 @@ Attribute:
 Class_type:
 	'class' | 'abstract class' | 'interface'
 ;
+Type:
+    'float' | 'int' | 'str'
+;
 
 Value:
+
 	(visibility=Visibility)?
+	(type=Type)?
 	name=ID
+;
+
+Parameter:
+    (type=Type)?
+    name=ID
 ;
 
 Method:
 	(visibility=Visibility)?
+	(type=Type)?
 	name=ID
-	'()'
+	'('
+	    (params+=Parameter[','])?
+	')'
 ;
 
 Visibility:
     '+' | '-'
 ;
+
 
 Enum:
   '[' values+=ID[','] ']'

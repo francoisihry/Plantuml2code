@@ -19,9 +19,19 @@ class Attribute:
         return self._type
 
 class Parameter:
-    def __init__(self, name, type = Accessibility.public):
+    def __init__(self, name, type = None):
         self._name = name
         self._type = type
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def type(self):
+        return self._type
+
+
 
 class Method(Attribute):
     def __init__(self,name, type = None, accessibility = Accessibility.public,
