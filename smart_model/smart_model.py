@@ -13,6 +13,7 @@ class SmartModel:
         else:
             self._packages =[]
 
+
     @property
     def classes(self):
         return self._classes
@@ -115,15 +116,12 @@ class Class:
         else:
             self._is_herited_by = []
 
-        self._extension = ''
 
     def __str__(self):
         return 'Class {}'.format(self._name)
 
     def make_file_path(self, output_path):
-        file_path = copy.deepcopy(self._path)
-        file_path[len(file_path)-1] += self._extension
-        return join(*(output_path+file_path))
+        return join(*(output_path+self.path))
 
     @property
     def name(self):
@@ -144,14 +142,6 @@ class Class:
     @file_name.setter
     def file_name(self, fn):
         self._file_name = fn
-
-    @property
-    def extension(self):
-        return self._extension
-
-    @extension.setter
-    def extension(self, ex):
-        self._extension = ex
 
     @property
     def accessibility(self):
