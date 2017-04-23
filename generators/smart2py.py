@@ -12,11 +12,25 @@ class Header:
             header += 'from {} import {}\n'.format(c.module_path, c.name)
         return header
 
+class ClassDef:
+    def __init__(self, smart_class):
+        self._smart_class = smart_class
+
+    def __str__(self):
+        py_class='class {}:\n'.format(self._smart_class.name)
+        py_class+='    def __init__(self):\n'
+        py_class += '        pass\n'
+        return py_class
+
+
+
+
 
 def _package2py(package):
     for c in package.classes:
         setattr(c, 'module_path', '.'.join(c.path))
         setattr(c, 'header', Header(c))
+        setattr(c, 'classe_def', ClassDef(c))
     for p in package.packages:
         _package2py(p)
 
@@ -38,6 +52,8 @@ def _gen_py_from_package(pack, output_path):
             os.makedirs(dir)
         with open(path, 'w') as file:
             file.write(str(c.header))
+            file.write("\n\n")
+            file.write(str(c.classe_def))
     for p in pack.packages:
         _gen_py_from_package(p, output_path)
 

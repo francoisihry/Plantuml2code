@@ -1,10 +1,13 @@
 import sys
 
 from parsers.plant2smart import plant2smart, MM_PLANT
+from generators.smart2py import smart2py
 
 DEBUG = False
 
-
+def plant2py(plant_uml_model,output):
+    smart_model = plant2smart(plant_uml_model)
+    smart2py(smart_model, output_path=output)
 
 
 def debug(str):
