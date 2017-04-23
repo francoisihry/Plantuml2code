@@ -37,18 +37,27 @@ def _add_composition(compo,smart_model):
 
 
 def _create_package(p, path=[]):
-    p_classes=[]
-    p_packages=[]
+    p_classes = []
+    p_packages = []
     for c in p.classes:
         class_path = deepcopy(p.path)
-
         p_classes.append(_create_class(c, path + class_path))
-    for pack in p.packages:
+    for t_pack in p.packages:
         pack_path = deepcopy(p.path)
-        p_packages.append(_create_package(pack, path + pack_path))
-    return Package(path + p.path, p_classes, p_packages)
+        p_packages.append(_create_package(t_pack, path + pack_path))
+    if len(p.path) == 1:
+        return Package(path+[p.path[0]], p_classes, p_packages)
+    else:
+        rt_pack = Package(path+[p.path[0]])
+        pack = rt_pack
 
-
+        for i in range(1, len(p.path)-1):
+            child_path = path+[p.path[k] for k in range(0,i+1)]
+            pack_child = Package(child_path)
+            pack.packages.append(pack_child)
+            pack=pack_child
+        pack.packages.append(Package(path+p.path, p_classes, p_packages))
+        return rt_pack
 
 
 def _create_class( c, path =[]):

@@ -65,14 +65,16 @@ class TestPlantUmlParsing(unittest.TestCase):
         self.assertEqual(len(a_simple_package.classes), 0)
 
         package2 = smart_model.packages[1]
-        self.assertEqual(package2.path,['path', 'to', 'my', 'package1'])
-        self.assertEqual(len(package2.classes),1)
-        self.assertEqual(package2.classes[0].path, ['path', 'to', 'my', 'package1','class_inside_package'])
+        self.assertEqual(package2.path,['path'])
+        self.assertEqual(len(package2.classes),0)
+        pack_path_to_my_package = package2.packages[0].packages[0].packages[0]
+        self.assertEqual(pack_path_to_my_package.path, ['path', 'to', 'my', 'package1'])
+        self.assertEqual(pack_path_to_my_package.classes[0].path, ['path', 'to', 'my', 'package1','class_inside_package'])
 
-        another_package = smart_model.packages[2]
+        another_package = smart_model.packages[2].packages[0]
         self.assertEqual(another_package.path, ['another', 'package'])
         self.assertEqual(len(another_package.packages),2)
-        pack_inside = another_package.packages[0]
+        pack_inside = another_package.packages[0].packages[0]
         self.assertEqual(pack_inside.path, ['another', 'package', 'inside', 'pack'])
         self.assertEqual(len(pack_inside.packages),1)
         hey_pack = pack_inside.packages[0]
@@ -127,7 +129,8 @@ class TestPlantUmlParsing(unittest.TestCase):
                 """
         plant_uml_model = MM_PLANT.model_from_str(plant)
         smart_model = plant2smart(plant_uml_model)
-        point = smart_model.packages[0].packages[0].classes[0]
+        pack_path_to_pack_element = smart_model.packages[0].packages[0].packages[0].packages[0]
+        point = pack_path_to_pack_element.classes[0]
         segment = smart_model.packages[1].classes[0]
         figure = smart_model.classes[0]
         self.assertEqual(figure.name,'Figure')
