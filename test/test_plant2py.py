@@ -11,6 +11,7 @@ class TestPlant2Py(unittest.TestCase):
                         package path.to.pack{
                             package element{
                                 class Point{
+                                    + Point(int x, int y)
                                     - x
                                     - y
                                     + get_middle()

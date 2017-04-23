@@ -15,14 +15,16 @@ class Header:
 class ClassDef:
     def __init__(self, smart_class):
         self._smart_class = smart_class
+        self._params = 'self'
+        if len(smart_class.constructors)==1:
+            constructor=smart_class.constructors[0]
+            self._params += ', '+', '.join([p.name for  p in constructor.parameters])
 
     def __str__(self):
         py_class='class {}:\n'.format(self._smart_class.name)
-        py_class+='    def __init__(self):\n'
+        py_class+='    def __init__({}):\n'.format(self._params)
         py_class += '        pass\n'
         return py_class
-
-
 
 
 
