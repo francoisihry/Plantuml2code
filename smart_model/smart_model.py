@@ -49,25 +49,65 @@ class SmartModel:
 
 
 
-def _to_snake_case(camel_case):
+def to_snake_case(camel_case):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', camel_case)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+
+class Relation:
+    def __init__(self, ref=None, _min=1, _max=1, label=None):
+        self._ref = ref
+        self._min = _min
+        self._max = _max
+        self._label = label
+
+    @property
+    def ref(self):
+        return self._ref
+
+    @ref.setter
+    def ref(self, r):
+        self._ref = r
+    
+    @property
+    def label(self):
+        return self._label
+
+    @label.setter
+    def label(self, l):
+        self._label = l
+
+    @property
+    def max(self):
+        return self._max
+
+    @max.setter
+    def max(self, m):
+        self._max = m
+        
+    @property
+    def min(self):
+        return self._min
+
+    @min.setter
+    def min(self, m):
+        self._min = m
+
 
 class Class:
     def __init__(self, name,
                  accessibility=Accessibility.public,
-                 attributes = None,
-                 methods = None,
-                 contains = None,
-                 contained_by = None,
-                 reference_to = None,
-                 is_referenced_by = None,
-                 herits_of = None,
-                 is_herited_by = None,
-                 pack_container = None
+                 attributes=None,
+                 contains=None,
+                 contained_by=None,
+                 reference_to=None,
+                 is_referenced_by=None,
+                 herits_of=None,
+                 is_herited_by=None,
+                 pack_container=None
                  ):
         self._name = name
-        self._file_name = _to_snake_case(name)
+        self._file_name = to_snake_case(name)
 
         self._accessibility = accessibility
         self._pack_container = pack_container
@@ -82,30 +122,35 @@ class Class:
         self._constructors = [m for m in self._methods
                               if m.name == self.name and m.accessibitily == Accessibility.public]
         # Composition
+        self._contains = []
         if contains:
-            self._contains = contains
-        else:
-            self._contains = []
-        self._contained_by = contained_by
+            for c in contains:
+                self._contains.append(Relation(c))
+
+        self._contained_by = []
+        if contained_by:
+            for c in contained_by:
+                self._contained_by.append(Relation(c))
 
         # Reference
+        self._reference_to = []
         if reference_to:
-            self._reference_to = reference_to
-        else:
-            self._reference_to = []
+            for c in reference_to:
+                self._reference_to.append(Relation(c))
+
+        self._is_referenced_by = []
         if is_referenced_by:
-            self._is_referenced_by = is_referenced_by
-        else:
-            self._is_referenced_by = []
+            for c in is_referenced_by:
+                self._is_referenced_by.append(Relation(c))
+
         # Inheritance
+        self._herits_of = []
         if herits_of:
-            self._herits_of = herits_of
-        else:
-            self._herits_of = []
+            self._herits_of.append(Relation(herits_of))
+
+        self._is_herited_by = []
         if is_herited_by:
-            self._is_herited_by = is_herited_by
-        else:
-            self._is_herited_by = []
+            self._is_herited_by.append(is_herited_by)
 
 
     def __str__(self):
@@ -171,10 +216,6 @@ class Class:
     def contained_by(self):
         return self._contained_by
 
-    @contained_by.setter
-    def contained_by(self, cl):
-        self._contained_by = cl
-
     @property
     def reference_to(self):
         return self._reference_to
@@ -186,10 +227,6 @@ class Class:
     @property
     def herits_of(self):
         return self._herits_of
-
-    @herits_of.setter
-    def herits_of(self, ho):
-        self._herits_of = ho
 
     @property
     def is_herited_by(self):

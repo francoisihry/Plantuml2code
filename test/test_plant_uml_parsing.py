@@ -111,9 +111,9 @@ class TestPlantUmlParsing(unittest.TestCase):
         point = smart_model.classes[0]
         figure = smart_model.classes[1]
         self.assertIsNotNone(point.contained_by)
-        self.assertEqual(point.contained_by, figure)
+        self.assertEqual(point.contained_by[0].ref, figure)
         self.assertEqual(len(figure.contains),1)
-        self.assertEqual(figure.contains[0], point)
+        self.assertEqual(figure.contains[0].ref, point)
 
     def test_complex_composition(self):
         plant = """
@@ -144,6 +144,40 @@ class TestPlantUmlParsing(unittest.TestCase):
         figure = smart_model.classes[0]
         self.assertEqual(figure.name,'Figure')
         self.assertIsNotNone(segment.contained_by)
-        self.assertEqual(segment.contained_by,figure)
-        self.assertEqual(figure.contains[0],segment)
-        self.assertEqual(segment.contains[0],point)
+        self.assertEqual(segment.contained_by[0].ref,figure)
+        self.assertEqual(figure.contains[0].ref,segment)
+        self.assertEqual(segment.contains[0].ref,point)
+
+    def test_inheritance(self):
+        plant = """
+                @startuml
+                package test {
+                    class A
+                }
+                class B
+                class C
+                class D
+                class E
+                A --> B
+                C --> B
+                C --> D
+                E --> A
+                @enduml
+                """
+        plant_uml_model = MM_PLANT.model_from_str(plant)
+        smart_model = plant2smart(plant_uml_model)
+        self.assertEqual(len(smart_model.classes), 4)
+        A = smart_model.packages[0].classes[0]
+        B = smart_model.classes[0]
+        C = smart_model.classes[1]
+        D = smart_model.classes[2]
+        E = smart_model.classes[3]
+        self.assertTrue(B in [r.ref for r in A.herits_of])
+        self.assertTrue(A in [r.ref for r in B.is_herited_by])
+        self.assertTrue(B in [r.ref for r in C.herits_of])
+        self.assertTrue(C in [r.ref for r in B.is_herited_by])
+        self.assertTrue(D in [r.ref for r in C.herits_of])
+        self.assertTrue(C in [r.ref for r in D.is_herited_by])
+        self.assertTrue(A in [r.ref for r in E.herits_of])
+        self.assertTrue(E in [r.ref for r in A.is_herited_by])
+

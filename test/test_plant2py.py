@@ -19,14 +19,20 @@ class TestPlant2Py(unittest.TestCase):
                         }
                     }
                     package geo {
-                        class segment
+                        class Segment{
+                            + Segment( point_a, point_b)
+                        }
+                    }
+                    class Couleur{
+                        + Couleur(color)
                     }
                     class Figure
                     class Triangle
                     Triangle --> Figure
 
-                    Figure *-- segment
-                    Point --* segment
+                    Figure 1 *-- 1 Couleur : couleur
+                    Figure 1 *-- * Segment : contient
+                    Point 1..* --* 1 Segment
                     @enduml
         """
         plant_uml_model = MM_PLANT.model_from_str(plant)

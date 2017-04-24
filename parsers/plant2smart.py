@@ -1,9 +1,8 @@
-from smart_model.smart_model import SmartModel, Class, Accessibility, Package
+from smart_model.smart_model import SmartModel, Class, Accessibility, Package, Relation
 from smart_model.attribute import Attribute, Method, Parameter
 from textx.metamodel import metamodel_from_file
 from os.path import join, dirname
-from copy import deepcopy
-import re
+
 
 MM_PLANT = metamodel_from_file(join(dirname(__file__), '../plant_uml_grammar.tx'))
 NAMES_SPACES = MM_PLANT.namespaces['plant_uml_grammar']
@@ -15,40 +14,68 @@ def plant2smart(plant):
     for p in plant.packages:
         smart_model.packages.append(_create_package(p))
     for r in plant.relations:
-        if isinstance(r, NAMES_SPACES['Composition']):
-            _add_composition(r, smart_model)
-        elif isinstance(r, NAMES_SPACES['Heritage']):
-            _add_heritage(r, smart_model)
+        _add_relation(r, smart_model)
     return smart_model
 
+class Range:
+    def __init__(self, plant_range):
+        if len(plant_range):
+            plant_range = plant_range[0]
+            if len(plant_range) == 1:
+                parsed = self._parse(plant_range[0])
+                if plant_range =='*':
+                    self.min = 0
+                    self.max = parsed
+                else:
+                    self.min = parsed
+                    self.max = parsed
+            else:
+                self.min = self._parse(plant_range[0])
+                self.max = self._parse(plant_range[3])
+        else:
+            self.min = None
+            self.max = None
 
-def _add_composition(compo,smart_model):
-    contenu = compo.contenu[0]
-    contenant = compo.contenant[0]
-    match_contenu = smart_model.find_classes_by_name(contenu.name)
-    match_contenant = smart_model.find_classes_by_name(contenant.name)
-    if len(match_contenant) == 1 and len(match_contenu) == 1 :
-        class_contenant = match_contenant[0]
-        class_contenu = match_contenu[0]
-        class_contenant.contains.append(class_contenu)
-        class_contenu.contained_by = class_contenant
+    def _parse(self, char):
+        if char == '*':
+            return float('inf')
+        else:
+            return int(char)
 
-    else:
-        raise Exception("probleme soit il ne trouve pas les contenus/contenants."
-                        "Soit il en trouve plus que 1")
-def _add_heritage(heritage,smart_model):
-    parent = heritage.contenant[0]
-    enfant = heritage.contenu[0]
-    match_enfant = smart_model.find_classes_by_name(enfant.name)
-    match_parent = smart_model.find_classes_by_name(parent.name)
-    if len(match_parent) == 1 and len(match_enfant) == 1 :
-        match_parent[0].is_herited_by.append(match_enfant[0])
-        match_enfant[0].herits_of = match_parent[0]
 
-    else:
-        raise Exception("probleme soit il ne trouve pas les enfants/parents."
-                        "Soit il en trouve plus que 1")
-
+def _add_relation(rel, smart_model):
+        contenu = rel.contenu[0]
+        contenant = rel.contenant[0]
+        class_contenu_range = Range(rel.range_contenu)
+        class_contenant_range = Range(rel.range_contenant)
+        match_contenu = smart_model.find_classes_by_name(contenu.name)
+        match_contenant = smart_model.find_classes_by_name(contenant.name)
+        if len(match_contenant) == 1 and len(match_contenu) == 1 :
+            class_contenant = match_contenant[0]
+            class_contenu = match_contenu[0]
+        else:
+            raise Exception("probleme soit il ne trouve pas les contenus/contenants."
+                            "Soit il en trouve plus que 1")
+        if isinstance(rel, NAMES_SPACES['Composition']):
+            contenant_contient = class_contenant.contains
+            contenu_contenu_par = class_contenu.contained_by
+        elif isinstance(rel, NAMES_SPACES['Heritage']):
+            contenant_contient = class_contenant.is_herited_by
+            contenu_contenu_par = class_contenu.herits_of
+        if len(rel.label)==1:
+            label = rel.label[0]
+        else:
+            label = None
+        contenant_contient.append(Relation(class_contenu,
+                                           class_contenu_range.min,
+                                           class_contenu_range.max,
+                                           label = label)
+                                  )
+        contenu_contenu_par.append(Relation(class_contenant,
+                                            class_contenant_range.min,
+                                            class_contenant_range.max,
+                                            label = label)
+                                   )
 
 def _create_package(p):
     classes = [_create_class(c, p ) for c in p.classes]

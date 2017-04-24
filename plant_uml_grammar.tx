@@ -7,15 +7,23 @@ Relation:
 ;
 
 Composition:
-    contenant=[Class] '*--' contenu=[Class]
+    contenant=[Class] ('*--'|(range_contenant=Range '*--'))   (range_contenu=Range)? contenu=[Class] (':'label=ID)?
     |
-    contenu=[Class] '--*' contenant=[Class]
+    contenu=[Class] (range_contenu=Range)? '--*' (range_contenant=Range)? contenant=[Class] (':'label=ID)?
 ;
 
 Heritage:
-    contenant=[Class] '<--' contenu=[Class]
+    contenant=[Class] (range_contenant=Range)? '<--' (range_contenu=Range)? contenu=[Class] (':'label=ID)?
     |
-    contenu=[Class] '-->' contenant=[Class]
+    contenu=[Class] (range_contenu=Range)? '-->' (range_contenant=Range)? contenant=[Class] (':'label=ID)?
+;
+
+
+Range:
+    ((Int|'*')'..'(Int|'*'))|Int|'*'
+;
+Int:
+    /[0-9]*/
 ;
 
 Class:
@@ -81,5 +89,4 @@ Package:
 		)*
 	'}'
 	)?
-
 ;

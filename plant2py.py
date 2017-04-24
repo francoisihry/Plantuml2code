@@ -1,7 +1,7 @@
 import sys
 
 from parsers.plant2smart import plant2smart, MM_PLANT
-from generators.smart2py import smart2py
+from generators.smart2py.smart2py import smart2py
 
 DEBUG = False
 

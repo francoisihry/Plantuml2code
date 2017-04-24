@@ -1,5 +1,5 @@
 import unittest
-from generators.smart2py import smart2py
+from generators.smart2py.smart2py import smart2py
 from smart_model.smart_model import *
 
 
