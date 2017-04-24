@@ -3,13 +3,19 @@ Plant:
 ;
 
 Relation:
-    Composition
+    (Heritage|Composition)
 ;
 
 Composition:
     contenant=[Class] '*--' contenu=[Class]
     |
     contenu=[Class] '--*' contenant=[Class]
+;
+
+Heritage:
+    contenant=[Class] '<--' contenu=[Class]
+    |
+    contenu=[Class] '-->' contenant=[Class]
 ;
 
 Class:

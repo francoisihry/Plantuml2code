@@ -17,6 +17,8 @@ def plant2smart(plant):
     for r in plant.relations:
         if isinstance(r, NAMES_SPACES['Composition']):
             _add_composition(r, smart_model)
+        elif isinstance(r, NAMES_SPACES['Heritage']):
+            _add_heritage(r, smart_model)
     return smart_model
 
 
@@ -33,6 +35,18 @@ def _add_composition(compo,smart_model):
 
     else:
         raise Exception("probleme soit il ne trouve pas les contenus/contenants."
+                        "Soit il en trouve plus que 1")
+def _add_heritage(heritage,smart_model):
+    parent = heritage.contenant[0]
+    enfant = heritage.contenu[0]
+    match_enfant = smart_model.find_classes_by_name(enfant.name)
+    match_parent = smart_model.find_classes_by_name(parent.name)
+    if len(match_parent) == 1 and len(match_enfant) == 1 :
+        match_parent[0].is_herited_by.append(match_enfant[0])
+        match_enfant[0].herits_of = match_parent[0]
+
+    else:
+        raise Exception("probleme soit il ne trouve pas les enfants/parents."
                         "Soit il en trouve plus que 1")
 
 
