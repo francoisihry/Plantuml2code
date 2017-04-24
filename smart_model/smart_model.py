@@ -187,6 +187,10 @@ class Class:
     def herits_of(self):
         return self._herits_of
 
+    @herits_of.setter
+    def herits_of(self, ho):
+        self._herits_of = ho
+
     @property
     def is_herited_by(self):
         return self._is_herited_by
