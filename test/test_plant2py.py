@@ -1,6 +1,7 @@
 import unittest
 
-from plant2py import *
+from generators.plant2py import *
+from parsers.model2model.plant2smart import MM_PLANT
 
 
 class TestPlant2Py(unittest.TestCase):
