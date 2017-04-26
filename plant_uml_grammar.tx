@@ -48,8 +48,8 @@ Type:
 ;
 
 Value:
-
 	(visibility=Visibility)?
+	(access=Access)?
 	(type=Type)?
 	name=ID
 ;
@@ -61,6 +61,7 @@ Parameter:
 
 Method:
 	(visibility=Visibility)?
+	(access=Access)?
 	(type=Type)?
 	name=ID
 	'('
@@ -71,6 +72,11 @@ Method:
 Visibility:
     '+' | '-'
 ;
+
+Access:
+    '{' ('static' | 'abstract') '}'
+;
+
 
 
 Enum:

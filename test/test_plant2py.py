@@ -25,6 +25,8 @@ class TestPlant2Py(unittest.TestCase):
                     }
                     class Couleur{
                         + Couleur(color)
+                        - set_new_color(color)
+                        + {static} get_rgb (color)
                     }
                     class Figure
                     class Triangle

@@ -1,7 +1,7 @@
 import unittest
 
 
-from smart_model.smart_model import Accessibility
+from smart_model.smart_model import Visibility
 from smart_model.attribute import Method, Attribute
 from parsers.plant2smart import plant2smart, MM_PLANT
 
@@ -23,15 +23,17 @@ class TestPlantUmlParsing(unittest.TestCase):
         classA = smart_model.classes[0]
         self.assertEqual(classA.path, ['a'])
         self.assertEqual(classA.name, 'A')
-        self.assertEqual(len(classA.attributes), 3)
+        self.assertEqual(len(classA.attributes), 1)
+        self.assertEqual(len(classA.constructors), 1)
+        self.assertEqual(len(classA.methods), 1)
         self.assertEqual(classA.constructors[0].name,'A')
-        self.assertEqual(classA.accessibility, Accessibility.public)
+        self.assertEqual(classA.visibility, Visibility.public)
         attr1 = classA.attributes[0]
         self.assertTrue(isinstance(attr1, Attribute))
         self.assertEqual(attr1.name,'attr1')
         self.assertEqual(attr1.type, 'int')
-        self.assertEqual(attr1.accessibitily, Accessibility.public)
-        func1 = classA.attributes[1]
+        self.assertEqual(attr1.visibility, Visibility.public)
+        func1 = classA.methods[0]
         self.assertTrue(isinstance(func1,Method))
         self.assertEqual(func1.name, 'func1')
         self.assertEqual(func1.type, 'str')
@@ -40,12 +42,12 @@ class TestPlantUmlParsing(unittest.TestCase):
         self.assertEqual(func1.parameters[0].name, 'arg')
         self.assertEqual(func1.parameters[1].type, 'int')
         self.assertEqual(func1.parameters[1].name, 'i')
-        self.assertEqual(func1.accessibitily, Accessibility.private)
+        self.assertEqual(func1.visibility, Visibility.private)
 
         classB = smart_model.classes[1]
         self.assertEqual(classB.name, 'B')
         self.assertEqual(len(classB.attributes), 0)
-        self.assertEqual(classB.accessibility, Accessibility.public)
+        self.assertEqual(classB.visibility, Visibility.public)
 
 
     def test_package(self):

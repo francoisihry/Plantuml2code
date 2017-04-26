@@ -1,19 +1,28 @@
-class Accessibility:
+class Visibility:
     (public,
      private,
-     protected,
-     static
-    ) = range(4)
+     protected
+    ) = range(3)
+
+
+class Access:
+    (static,
+     abstract
+    ) = range(2)
+
 
 class Attribute:
-    def __init__(self, name, type = None, accessibility = Accessibility.public):
+    def __init__(self, name, type=None,
+                 visibility=Visibility.public,
+                 access=None):
         self._name = name
         self._type = type
-        self._accessibility = accessibility
+        self._visibility = visibility
+        self._access = access
 
     @property
-    def accessibitily(self):
-        return self._accessibility
+    def visibility(self):
+        return self._visibility
 
     @property
     def name(self):
@@ -22,6 +31,11 @@ class Attribute:
     @property
     def type(self):
         return self._type
+
+    @property
+    def access(self):
+        return self._access
+
 
 class Parameter:
     def __init__(self, name, type = None):
@@ -39,9 +53,10 @@ class Parameter:
 
 
 class Method(Attribute):
-    def __init__(self,name, type = None, accessibility = Accessibility.public,
+    def __init__(self, name, type = None, visibility = Visibility.public,
+                 access=None,
                  parameters=[]):
-        Attribute.__init__(self, name, type, accessibility)
+        Attribute.__init__(self, name, type, visibility, access)
         self._parameters = parameters
 
     @property

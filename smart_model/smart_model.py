@@ -1,6 +1,6 @@
 from os.path import join
 import re
-from smart_model.attribute import  Method, Accessibility
+from smart_model.attribute import  Method, Visibility
 
 class SmartModel:
     def __init__(self, classes=None, packages=None):
@@ -96,7 +96,7 @@ class Relation:
 
 class Class:
     def __init__(self, name,
-                 accessibility=Accessibility.public,
+                 visibility=Visibility.public,
                  attributes=None,
                  contains=None,
                  contained_by=None,
@@ -109,18 +109,25 @@ class Class:
         self._name = name
         self._file_name = to_snake_case(name)
 
-        self._accessibility = accessibility
+        self._visibility = visibility
         self._pack_container = pack_container
+
+        self._attributes = []
+        self._methods = []
+
         if attributes:
-            self._attributes = attributes
-        else:
-            self._attributes = []
+            for at in attributes:
+                if isinstance(at, Method):
+                    self._methods.append(at)
+                else:
+                    self._attributes.append(at)
 
-        self._methods = [at for at in self._attributes
-                         if isinstance(at,Method)]
+        self._constructors = []
+        for m in self._methods:
+            if m.name == self.name and m.visibility == Visibility.public:
+                self._constructors.append(m)
+                self._methods.remove(m)
 
-        self._constructors = [m for m in self._methods
-                              if m.name == self.name and m.accessibitily == Accessibility.public]
         # Composition
         self._contains = []
         if contains:
@@ -185,8 +192,8 @@ class Class:
         self._file_name = fn
 
     @property
-    def accessibility(self):
-        return self._accessibility
+    def visibility(self):
+        return self._visibility
 
     @property
     def path(self):

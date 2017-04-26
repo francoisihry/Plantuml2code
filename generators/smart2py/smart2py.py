@@ -1,6 +1,8 @@
 import os
+
+from todo import todo
+from smart_model.attribute import Visibility, Access
 from smart_model.smart_model import Package, to_snake_case
-import generators.smart2py.todo as todo
 
 
 class Header:
@@ -30,7 +32,18 @@ class ClassDef:
     def gen(self):
         py_class='class {}{}:\n'.format(self._smart_class.name, self._inhertited_class)
         py_class+='    def __init__({}):\n'.format(self._params)
-        # Add contained class:
+        content = self._gen_contained()
+        content += self._gen_attributes()
+
+        if content == '':
+            py_class += '        pass\n'
+        else:
+            py_class += content
+        py_class += self._gen_methods()
+        return py_class
+
+    def _gen_contained(self):
+        contained_generated = ''
         for c in self._smart_class.contains:
             if c.label:
                 label = c.label
@@ -47,19 +60,47 @@ class ClassDef:
                 params = ''
                 constructor = c.ref.name + '()'
             if c.max == 1 and c.min == 1:
-                py_class+= '        # '+todo.define_params(params)+'\n'
-                py_class+= '        self.{} = {}\n'.format(label,constructor)
+                contained_generated+= todo('        # ' + 'TODO define the '
+                                                          'parameters : {}\n'.format(' ,'.join(params)))
+                contained_generated+= '        self.{} = {}\n'.format(label,constructor)
             else:
-                py_class += '        # TODO you should add {} elements in the list'.format(c.ref.name)
+                todo_add_elements = '        # TODO you should add {} elements in the list'.format(c.ref.name)
                 if c.max != float('inf'):
-                    py_class += ' up to {} elements'.format(c.max)
-                py_class += '\n'
-                py_class+= '        self.{} = []\n'.format(label)
+                    todo_add_elements += ' up to {} elements'.format(c.max)
+                todo_add_elements+='\n'
+                contained_generated += todo(todo_add_elements)
+                contained_generated+= '        self.{} = []\n'.format(label)
+        return contained_generated
 
+    def _gen_attributes(self):
+        attributes_generated = ''
+        for at in self._smart_class.attributes:
+            if at.visibility is not Visibility.public:
+                at_name = '_' + at.name
+            else:
+                at_name = at.name
+            attributes_generated += '        self.{} = None\n'.format(at_name)
+        return attributes_generated
+    
+    def _gen_methods(self):
+        methods_generated = ''
+        for met in self._smart_class.methods:
+            methods_generated += '\n'
+            decorator =''
+            params = 'self, '+', '.join(p.name for p in met.parameters)
+            if met.access == Access.static:
+                decorator += '    @staticmethod\n'
 
+            if met.visibility is not Visibility.public:
+                met_name = '_' + met.name
+            else:
+                met_name = met.name
+            methods_generated += decorator
+            methods_generated += '    def {}({}):\n'.format(met_name, params)
+            methods_generated += todo('        # TODO : Complete method content\n')
+            methods_generated += '        pass\n'
+        return methods_generated
 
-        py_class += '        pass\n'
-        return py_class
 
 
 def _package2py(package):

@@ -1,5 +1,5 @@
-from smart_model.smart_model import SmartModel, Class, Accessibility, Package, Relation
-from smart_model.attribute import Attribute, Method, Parameter
+from smart_model.smart_model import SmartModel, Class, Visibility, Package, Relation
+from smart_model.attribute import Attribute, Method, Parameter, Access
 from textx.metamodel import metamodel_from_file
 from os.path import join, dirname
 
@@ -88,21 +88,30 @@ def _create_class( c, container):
     for at in c.attributes:
         name = at.name
         type = at.type
-        accesibility =_parse_accessibility(at.visibility)
+        visibility =_parse_visibility(at.visibility)
+        access = _parse_access(at.access)
         if isinstance(at,NAMES_SPACES['Value']):
             attributes.append(Attribute(name, type=type,
-                                     accessibility=accesibility))
+                                     visibility=visibility,
+                                        access=access))
         else:
             params = [Parameter(p.name, p.type) for p in at.params]
-            attributes.append(Method(name, type=type, accessibility=accesibility,
-                                     parameters=params))
+            attributes.append(Method(name, type=type, visibility=visibility,
+                                     parameters=params,
+                                        access=access))
 
 
     return Class(c.name,
                  attributes=attributes,
                  pack_container=container)
 
-def _parse_accessibility(visibility):
-    accessibitity = {"+":Accessibility.public,
-                     "-" : Accessibility.private}
+def _parse_visibility(visibility):
+    accessibitity = {"+":Visibility.public,
+                     "-" : Visibility.private}
+    return accessibitity[visibility]
+
+def _parse_access(visibility):
+    accessibitity = {"{static}":Access.static,
+                     "{abstract}" : Access.abstract,
+                     None:None}
     return accessibitity[visibility]
