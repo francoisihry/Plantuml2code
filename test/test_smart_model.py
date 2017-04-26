@@ -1,5 +1,5 @@
 import unittest
-from smart_model.smart_model import *
+from smart_model.model import *
 
 
 class TestSmartModel(unittest.TestCase):

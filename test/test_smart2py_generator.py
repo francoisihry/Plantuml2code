@@ -1,6 +1,6 @@
 import unittest
 from parsers.model2code.smart2py.smart2py import smart2py
-from smart_model.smart_model import *
+from smart_model.model import *
 
 
 

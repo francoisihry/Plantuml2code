@@ -164,7 +164,7 @@ class Class:
         return 'Class {}'.format(self._name)
 
     def make_file_path(self, output_path):
-        return join(*(output_path+self.path))
+        return join(output_path,join(*(self.path)))
 
 
     @property
@@ -263,7 +263,6 @@ class Package:
                                        packages=packages,
                                        container=self)
                                   ]
-
 
 
     def __str__(self):

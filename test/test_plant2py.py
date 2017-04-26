@@ -39,4 +39,4 @@ class TestPlant2Py(unittest.TestCase):
                     @enduml
         """
         plant_uml_model = MM_PLANT.model_from_str(plant)
-        plant2py(plant_uml_model,['output'])
+        plant2py(plant_uml_model,['output'],False,True)

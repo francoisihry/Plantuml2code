@@ -1,7 +1,7 @@
 import unittest
 
 
-from smart_model.smart_model import Visibility
+from smart_model.model import Visibility
 from smart_model.attribute import Method, Attribute
 from parsers.model2model.plant2smart import plant2smart, MM_PLANT
 

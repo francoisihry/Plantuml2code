@@ -1,4 +1,4 @@
-from smart_model.smart_model import SmartModel, Class, Visibility, Package, Relation
+from smart_model.model import SmartModel, Class, Visibility, Package, Relation
 from smart_model.attribute import Attribute, Method, Parameter, Access
 from textx.metamodel import metamodel_from_file
 from os.path import join, dirname

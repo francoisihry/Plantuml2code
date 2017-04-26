@@ -2,7 +2,7 @@ import os
 
 from tools.todo import todo
 from smart_model.attribute import Visibility, Access
-from smart_model.smart_model import Package, to_snake_case
+from smart_model.model import Package, to_snake_case
 
 
 class Header:
@@ -114,7 +114,7 @@ def _package2py(package):
 
 def _gen_py_from_package(pack, output_path):
     if isinstance(pack, Package):
-        init_path = os.path.join(*(output_path+pack.path + ['__init__.py']))
+        init_path = os.path.join(output_path,os.path.join(*(pack.path + ['__init__.py'])))
 
         dir = os.path.dirname(init_path)
         if not os.path.exists(dir):

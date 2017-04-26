@@ -1,6 +1,17 @@
-from sys import argv, exit
-from os.path import exists, isdir
 import getopt
+from os import getcwd
+from os.path import exists, isdir
+from os.path import join
+from sys import argv, exit
+
+from generators.plant2py import plant2py
+
+
+def get_path(path):
+    if exists(join(getcwd(),path)):
+        return join(getcwd(),path)
+    else:
+        return path
 
 def usage():
     print(
@@ -17,6 +28,17 @@ Mandatory arguments to long options are mandatory for short options too.
       --disable-todo    disable todo indications
  """
     )
+
+def generate(language, plantuml_file, output, debug_enabled, todo_enabled):
+    print("generating...")
+    print('language ={}'.format(language))
+    print('output dir ={}'.format(output))
+    print('plant uml file ={}'.format(plantuml_file))
+    print('debug ={}'.format(debug_enabled))
+    print('todo enabled ={}'.format(todo_enabled))
+    plant2py(plantuml_file,output,debug_enabled,todo_enabled)
+
+
 def main(argv):
     if len(argv)<3:
         print('Not enough arguments.')
@@ -27,17 +49,34 @@ def main(argv):
         print('{} is not a correct language.'.format(language))
         usage()
         exit(2)
-    plant_uml_path = argv[2]
+    plant_uml_path = get_path(argv[2])
     if not exists(plant_uml_path) or isdir(plant_uml_path):
         print('PlantUml file note found : {}'.format(plant_uml_path))
         usage()
         exit(2)
 
+    global output
+    debug = False
+    enable_todo = True
+    output = getcwd()
+    if len(argv)==3:
+        generate(language,plant_uml_path, output, debug, enable_todo)
+        exit(2)
+    expected_opts = ("hd", ["help", "debug","disable-todo"])
+
+    if len(getopt.getopt([argv[3]], expected_opts[0], expected_opts[1])[0])>0:
+        argv_start=3
+    elif exists(argv[3]) and isdir(argv[3]):
+
+        output = get_path(argv[3])
+        argv_start=4
+    else:
+        print('Incorrect output path : {}'.format(argv[3]))
+        usage()
+        exit(2)
+
     try:
-        print(argv)
-        ar = argv[3:]
-        opts, args = getopt.getopt(argv[3:], "hd", ["help", "debug","disable-todo"])
-        print(opts)
+        opts, args = getopt.getopt(argv[argv_start:], expected_opts[0], expected_opts[1])
     except getopt.GetoptError as e:
         print(str(e))
         usage()
@@ -46,10 +85,8 @@ def main(argv):
         print('Unexpected argument : {}'.format(', '.join(args)))
         usage()
         exit(2)
-    debug = False
-    enable_todo = True
+
     for opt, arg in opts:
-        print("opt={}".format(opt))
         if opt in ("-h", "--help"):
             usage()
             exit()
@@ -61,6 +98,8 @@ def main(argv):
             print("Incorrect argument : {}\n".format(opt))
             usage()
             exit(2)
-# main(['1','c','LICENSE','-h','-e'])
+    generate(language, plant_uml_path, output, debug, enable_todo)
+
+# main(['1','c','LICENSE','-d'])
 if __name__ == "__main__" :
     main(argv)
