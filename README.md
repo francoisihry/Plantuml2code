@@ -1,4 +1,4 @@
-# plant2code
+# plantuml2code
 This project aims to allow developpers to generate code from a Plant UML class diagramm.
 Languages curently supported :
   - python
@@ -7,7 +7,11 @@ Languages curently supported :
 
 - 1) Define a PlantUML class diagram:
 
+<<<<<<< HEAD
  PlantUML is an easy grammar that generates UML drawings : [PlantUML project](https://nodesource.com/products/nsolid)
+=======
+ PlantUML is an easy grammar that generates UML drawings : [PlantUML project](http://plantuml.com/class-diagram)
+>>>>>>> f4bf543d96af73f64d88fac81b182d0dd1b2c558
 
 - 2) Launch plant2code with the specified language and the diagram path as arguments (you can also specify where you want the code to be generated)
 ```sh
