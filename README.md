@@ -17,7 +17,7 @@ $ plant2code python path/to/plantuml_diagram.txt /tmp/output
 - 3) That's it ! Your code as been generated, now you should follow the todo indications (printed as comment inside the code) to complete the code.
 
 # Documentation:
-'''
+```
 Usage: plant2code <python|c> PLANT_UML_FILE [OPTION]...         (1st form)
   or:  plant2code <python|c> PLANT_UML_FILE OUTPUT [OPTION]...  (2nd form)
 
@@ -28,7 +28,7 @@ Mandatory arguments to long options are mandatory for short options too.
   -h, --help            display this help and exit
   -d, --debug           enable debug
       --disable-todo    disable todo indications
-'''
+```
 # Feedbacks:
 
 Interested in that project ? You found a bug ? An improvement idea ?
