@@ -1,7 +1,7 @@
 import unittest
 
 from generators.plant2py import *
-from parsers.model2model.plant2smart import MM_PLANT
+from os.path import join, dirname
 
 
 class TestPlant2Py(unittest.TestCase):
@@ -38,5 +38,8 @@ class TestPlant2Py(unittest.TestCase):
                     Point 1..* --* 1 Segment
                     @enduml
         """
-        plant_uml_model = MM_PLANT.model_from_str(plant)
-        plant2py(plant_uml_model,['output'],False,True)
+        plant_file=join(dirname(__file__), join('data','diagram_1.tx'))
+        with open(plant_file, 'w') as file:
+            file.write(plant)
+        plant2py(plant_file,join(dirname(__file__),'output'),
+                 debug_enabled=False,todo_enabled=True)

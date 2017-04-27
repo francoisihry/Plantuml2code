@@ -1,5 +1,5 @@
-from smart_model.model import SmartModel, Class, Visibility, Package, Relation
-from smart_model.attribute import Attribute, Method, Parameter, Access
+from smart_model.model import SmartModel, Class, Visibility, Package, Relation, Enum
+from smart_model.attribute import Attribute, Method, Parameter, Access, Type
 from textx.metamodel import metamodel_from_file
 from os.path import join, dirname
 
@@ -7,14 +7,20 @@ from os.path import join, dirname
 MM_PLANT = metamodel_from_file(join(dirname(__file__), '../../plant_uml_grammar.tx'))
 NAMES_SPACES = MM_PLANT.namespaces['plant_uml_grammar']
 
+
 def plant2smart(plant):
     smart_model = SmartModel()
     for c in plant.classes:
-        smart_model.classes.append(_create_class(c, None))
+        smart_model.classes[c.name] = _create_class(c, None)
+    for enum in plant.enums:
+        smart_model.enums[enum.name] = Enum(enum.name, enum.labels)
     for p in plant.packages:
         smart_model.packages.append(_create_package(p))
     for r in plant.relations:
         _add_relation(r, smart_model)
+    # add type : must be done at the end so that it can link to existing class
+    _add_types(plant, smart_model)
+
     return smart_model
 
 class Range:
@@ -79,24 +85,45 @@ def _add_relation(rel, smart_model):
 
 def _create_package(p):
     classes = [_create_class(c, p ) for c in p.classes]
+    enums = {e.name : Enum(e.name, e.labels) for e in p.enums}
     packages = [_create_package(pack) for pack in p.packages]
-    return Package(p.path, classes, packages)
+    return Package(p.path, classes, packages, enums=enums)
 
+def _add_types(plant, smart_model):
+    for plant_class in plant.classes:
+        smart_class = smart_model.classes[plant_class.name]
+        for plant_at in plant_class.attributes:
+            if isinstance(plant_at,NAMES_SPACES['Value']):
+                smart_at = smart_class.attributes[plant_at.name]
+            else:
+                if plant_at.name == plant_class.name:
+                    smart_at = smart_class.constructors[0]
+                else:
+                    smart_at = smart_class.methods[plant_at.name]
+                for i in range(0, len(plant_at.params)):
+                    plant_param = plant_at.params[i]
+                    smart_param = smart_at.parameters[i]
+                    if hasattr(plant_param, 'type'):
+                        p_type = _parse_type(plant_param.type, smart_model)
+                    else:
+                        p_type = None
+                    smart_param.type = p_type
+            smart_at.type = _parse_type(plant_at.type, smart_model)
 
 def _create_class( c, container):
     attributes = []
     for at in c.attributes:
         name = at.name
-        type = at.type
+        # type = _parse_type(at.type)
         visibility =_parse_visibility(at.visibility)
         access = _parse_access(at.access)
         if isinstance(at,NAMES_SPACES['Value']):
-            attributes.append(Attribute(name, type=type,
+            attributes.append(Attribute(name,
                                      visibility=visibility,
                                         access=access))
         else:
-            params = [Parameter(p.name, p.type) for p in at.params]
-            attributes.append(Method(name, type=type, visibility=visibility,
+            params = [Parameter(p.name) for p in at.params]
+            attributes.append(Method(name,  visibility=visibility,
                                      parameters=params,
                                         access=access))
 
@@ -104,6 +131,35 @@ def _create_class( c, container):
     return Class(c.name,
                  attributes=attributes,
                  pack_container=container)
+
+def _parse_type(_type, smart_model):
+    parse = {"int":Type.int,
+                  "Int":Type.int,
+                  "float" : Type.float,
+                  "Float" : Type.float,
+                  "str" : Type.string,
+                  "Str" : Type.string,
+                  "String" : Type.string,
+                  "void" : Type.void,
+                  "Void" : Type.void,
+                  None:None
+                  }
+    if _type in parse.keys():
+        return parse[_type]
+    class_names = _make_class_names_dictionnary(smart_model)
+    if _type in class_names.keys():
+        return class_names[_type]
+    else:
+        raise Exception('Unable to parse {} type'.format(_type))
+
+
+def _make_class_names_dictionnary(pack):
+    class_list = pack.classes.items()
+    for p in pack.packages:
+        class_list += p.classes.items()
+    return dict(class_list)
+
+    pass
 
 def _parse_visibility(visibility):
     accessibitity = {"+":Visibility.public,

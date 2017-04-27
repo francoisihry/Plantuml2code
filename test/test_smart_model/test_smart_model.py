@@ -16,6 +16,6 @@ class TestSmartModel(unittest.TestCase):
         pack_path_to_my_package = smart_model_1.packages[0].packages[0].packages[0]
         self.assertEqual(pack_path_to_my_package.path, ['path','to','my_package'])
         self.assertEqual(len(pack_path_to_my_package.classes), 1)
-        self.assertEqual(pack_path_to_my_package.classes[0].name, "classe_C")
+        self.assertEqual(pack_path_to_my_package.classes["classe_C"].name, "classe_C")
         self.assertEqual(pack_path_to_my_package.packages[0].path, ['path', 'to', 'my_package','empty_package'])
 

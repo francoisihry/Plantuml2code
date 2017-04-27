@@ -5,7 +5,7 @@ from os.path import join, dirname
 
 class TestPlantUmlGrammar(unittest.TestCase):
     def setUp(self):
-        self.meta_model = metamodel_from_file(join(dirname(__file__) , '../plant_uml_grammar.tx'))
+        self.meta_model = metamodel_from_file(join(dirname(__file__), '..','..', '..', 'plant_uml_grammar.tx'))
         self.names_spaces = self.meta_model.namespaces['plant_uml_grammar']
 
 

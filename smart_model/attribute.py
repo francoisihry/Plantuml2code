@@ -11,6 +11,14 @@ class Access:
     ) = range(2)
 
 
+class Type:
+    (int,
+     float,
+     void,
+     string
+    ) = range(4)
+
+
 class Attribute:
     def __init__(self, name, type=None,
                  visibility=Visibility.public,
@@ -32,6 +40,10 @@ class Attribute:
     def type(self):
         return self._type
 
+    @type.setter
+    def type(self, t):
+        self._type = t
+
     @property
     def access(self):
         return self._access
@@ -49,6 +61,10 @@ class Parameter:
     @property
     def type(self):
         return self._type
+
+    @type.setter
+    def type(self, t):
+        self._type = t
 
 
 

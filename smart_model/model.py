@@ -3,16 +3,24 @@ import re
 from smart_model.attribute import  Method, Visibility
 
 class SmartModel:
-    def __init__(self, classes=None, packages=None):
+    def __init__(self, classes=None, packages=None, enums=None):
         if classes:
             self._classes = classes
         else:
-            self._classes = []
+            self._classes = {}
         if packages:
             self._packages = packages
         else:
             self._packages =[]
+        if enums:
+            self._enums = enums
+        else:
+            self._enums ={}
 
+
+    @property
+    def enums(self):
+        return self._enums
 
     @property
     def classes(self):
@@ -23,7 +31,7 @@ class SmartModel:
         return self._packages
 
     def add_class(self, c):
-        self._classes.append(c)
+        self._classes[c.name] = c
 
     def add_package(self, p):
         self._packages.append(p)
@@ -41,11 +49,26 @@ class SmartModel:
 
     @staticmethod
     def _find_classes_in_pack_by_name(pack, name):
-        class_list = [c for c in pack.classes if c.name == name]
+        class_list = []
+        if name in pack.classes.keys():
+            class_list.append(pack.classes[name])
         for pack in pack.packages:
             class_list += SmartModel._find_classes_in_pack_by_name(pack, name)
         return class_list
 
+
+class Enum:
+    def __init__(self, name, labels):
+        self._name = name
+        self._labels = labels
+
+    @property
+    def labels(self):
+        return self._labels
+
+    @property
+    def name(self):
+        return self._name
 
 
 
@@ -112,21 +135,20 @@ class Class:
         self._visibility = visibility
         self._pack_container = pack_container
 
-        self._attributes = []
-        self._methods = []
+        self._attributes = {}
+        self._methods = {}
 
         if attributes:
             for at in attributes:
                 if isinstance(at, Method):
-                    self._methods.append(at)
+                    self._methods[at.name] = at
                 else:
-                    self._attributes.append(at)
+                    self._attributes[at.name] = at
 
         self._constructors = []
-        for m in self._methods:
-            if m.name == self.name and m.visibility == Visibility.public:
-                self._constructors.append(m)
-                self._methods.remove(m)
+        if self.name in self._methods.keys():
+            if self._methods[self.name].visibility == Visibility.public:
+                self._constructors.append(self._methods.pop(self.name))
 
         # Composition
         self._contains = []
@@ -241,11 +263,11 @@ class Class:
 
 
 class Package:
-    def __init__(self, path , classes = None, packages = None, container = None):
+    def __init__(self, path , classes = None, packages = None, container = None, enums=None):
         self._container = container
         self._name = path[0]
 
-        self._classes = []
+        self._classes = {}
         self._packages = []
         if len(path) == 1:
 
@@ -263,6 +285,14 @@ class Package:
                                        packages=packages,
                                        container=self)
                                   ]
+        if enums:
+            self._enums = enums
+        else:
+            self._enums ={}
+
+    @property
+    def enums(self):
+        return self._enums
 
 
     def __str__(self):
@@ -270,7 +300,7 @@ class Package:
 
 
     def _add_class(self, c):
-        self._classes.append(c)
+        self._classes[c.name] = c
         c.pack_container = self
 
     def _add_package(self, p):

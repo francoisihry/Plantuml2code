@@ -74,7 +74,7 @@ class ClassDef:
 
     def _gen_attributes(self):
         attributes_generated = ''
-        for at in self._smart_class.attributes:
+        for at in self._smart_class.attributes.values():
             if at.visibility is not Visibility.public:
                 at_name = '_' + at.name
             else:
@@ -84,7 +84,7 @@ class ClassDef:
     
     def _gen_methods(self):
         methods_generated = ''
-        for met in self._smart_class.methods:
+        for met in self._smart_class.methods.values():
             methods_generated += '\n'
             decorator =''
             params = 'self, '+', '.join(p.name for p in met.parameters)
@@ -104,7 +104,7 @@ class ClassDef:
 
 
 def _package2py(package):
-    for c in package.classes:
+    for c in package.classes.values():
         setattr(c, 'module_path', '.'.join(c.path))
         setattr(c, 'header', Header(c))
         setattr(c, 'classe_def', ClassDef(c))
@@ -122,7 +122,7 @@ def _gen_py_from_package(pack, output_path):
         with open(init_path, 'w'):
             ...
 
-    for c in pack.classes:
+    for c in pack.classes.values():
         path = c.make_file_path(output_path)+'.py'
         dir = os.path.dirname(path)
         if not os.path.exists(dir):
@@ -135,7 +135,7 @@ def _gen_py_from_package(pack, output_path):
         _gen_py_from_package(p, output_path)
 
 
-def smart2py(smart_model, output_path = []):
+def smart2py(smart_model, output_path=[]):
     _package2py(smart_model)
     _gen_py_from_package(smart_model, output_path)
 

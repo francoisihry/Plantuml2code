@@ -1,5 +1,5 @@
 Plant:
-    '@startuml'  (classes+=Class |  packages+=Package | relations+=Relation)* '@enduml'
+    '@startuml'  (classes+=Class |  packages+=Package | enums+=Enum |relations+=Relation)* '@enduml'
 ;
 
 Relation:
@@ -35,7 +35,15 @@ Class:
         '}'
     )?
 ;
-
+Enum:
+    'enum'
+    name = ID
+    (
+        '{'
+                labels*= ID
+        '}'
+    )?
+;
 Attribute:
     Method|Value
 ;
@@ -55,9 +63,11 @@ Value:
 ;
 
 Parameter:
-    (type=Type)?
-    name=ID
+    ParameterWithType | ParameterWithoutType
 ;
+
+ParameterWithType: type=ID name=ID;
+ParameterWithoutType: name=ID;
 
 Method:
 	(visibility=Visibility)?
@@ -79,9 +89,6 @@ Access:
 
 
 
-Enum:
-  '[' values+=ID[','] ']'
-;
 
 Package:
     'package'
@@ -92,6 +99,8 @@ Package:
 			( classes+=Class )
 		|
 			( packages+=Package )
+		|
+			( enums+=Enum )
 		)*
 	'}'
 	)?
