@@ -6,6 +6,7 @@ Languages curently supported :
 # How to use:
 
 1) Define a PlantUML class diagram:
+
 PlantUML is an easy grammar that generates UML drawings : [PlantUML project](https://nodesource.com/products/nsolid)
 2) Launch plant2code with the specified language and the diagram path as arguments (you can also specify where you want the code to be generated)
 ```sh
