@@ -19,14 +19,19 @@ $ plant2code python path/to/plantuml_diagram.txt /tmp/output
 # Documentation:
 
 Usage: plant2code <python|c> PLANT_UML_FILE [OPTION]...         (1st form)
+
   or:  plant2code <python|c> PLANT_UML_FILE OUTPUT [OPTION]...  (2nd form)
 
 In the 1st form, generate code from the PLANT_UML_FILE in the current directory.
+
 In the 2nd form, generate code from the PLANT_UML_FILE and output it in the OUPUT path.
 
 Mandatory arguments to long options are mandatory for short options too.
+
   -h, --help            display this help and exit
+  
   -d, --debug           enable debug
+  
       --disable-todo    disable todo indications
 
 # Feedbacks:
