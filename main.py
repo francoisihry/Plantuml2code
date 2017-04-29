@@ -5,6 +5,7 @@ from os.path import join
 from sys import argv, exit
 
 from generators.plant2py import plant2py
+from generators.plant2c import plant2c
 
 
 def get_path(path):
@@ -36,7 +37,10 @@ def generate(language, plantuml_file, output, debug_enabled, todo_enabled):
     print('plant uml file ={}'.format(plantuml_file))
     print('debug ={}'.format(debug_enabled))
     print('todo enabled ={}'.format(todo_enabled))
-    plant2py(plantuml_file,output,debug_enabled,todo_enabled)
+    if language == 'python':
+        plant2py(plantuml_file,output,debug_enabled,todo_enabled)
+    elif language == 'c':
+        plant2c(plantuml_file,output,debug_enabled,todo_enabled)
 
 
 def main(argv):

@@ -21,7 +21,7 @@ class TestPlantUmlParsing(unittest.TestCase):
         smart_model = plant2smart(plant_uml_model)
         self.assertEqual(len(smart_model.classes), 2)
         classA = smart_model.classes['A']
-        self.assertEqual(classA.path, ['a'])
+        self.assertEqual(classA.path, [])
         self.assertEqual(classA.name, 'A')
         self.assertEqual(len(classA.attributes), 1)
         self.assertEqual(len(classA.constructors), 1)
@@ -80,7 +80,7 @@ class TestPlantUmlParsing(unittest.TestCase):
         self.assertEqual(len(package2.classes),0)
         pack_path_to_my_package = package2.packages[0].packages[0].packages[0]
         self.assertEqual(pack_path_to_my_package.path, ['path', 'to', 'my', 'package1'])
-        self.assertEqual(pack_path_to_my_package.classes['ClassInsidePackage'].path, ['path', 'to', 'my', 'package1','class_inside_package'])
+        self.assertEqual(pack_path_to_my_package.classes['ClassInsidePackage'].path, ['path', 'to', 'my', 'package1'])
 
         another_package = smart_model.packages[2].packages[0]
         self.assertEqual(another_package.path, ['another', 'package'])
@@ -91,7 +91,7 @@ class TestPlantUmlParsing(unittest.TestCase):
         hey_pack = pack_inside.packages[0]
         self.assertEqual(len(hey_pack.classes), 1)
         point = hey_pack.classes['Point']
-        self.assertEqual(point.path, ['another', 'package', 'inside', 'pack', 'hey', 'point'])
+        self.assertEqual(point.path, ['another', 'package', 'inside', 'pack', 'hey'])
         self.assertEqual(another_package.packages[1].path, ['another', 'package', 'empty_package'])
 
     def test_simple_composition(self):

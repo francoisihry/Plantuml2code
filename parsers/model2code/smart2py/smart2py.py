@@ -105,7 +105,7 @@ class ClassDef:
 
 def _package2py(package):
     for c in package.classes.values():
-        setattr(c, 'module_path', '.'.join(c.path))
+        setattr(c, 'module_path', '.'.join(c.path+[c.file_name]))
         setattr(c, 'header', Header(c))
         setattr(c, 'classe_def', ClassDef(c))
     for p in package.packages:
