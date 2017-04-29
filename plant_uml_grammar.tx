@@ -51,14 +51,20 @@ Attribute:
 Class_type:
 	'class' | 'abstract class' | 'interface'
 ;
-Type:
-    'float' | 'int' | 'str'
-;
 
 Value:
-	(visibility=Visibility)?
+	ValueWithType|ValueWithoutType
+;
+
+ValueWithType:
+    (visibility=Visibility)?
 	(access=Access)?
-	(type=Type)?
+	type=ID
+	name=ID
+;
+ValueWithoutType:
+    (visibility=Visibility)?
+	(access=Access)?
 	name=ID
 ;
 
@@ -70,9 +76,23 @@ ParameterWithType: type=ID name=ID;
 ParameterWithoutType: name=ID;
 
 Method:
+	MethodWithType|MethodWithoutType
+;
+
+MethodWithType:
 	(visibility=Visibility)?
 	(access=Access)?
-	(type=Type)?
+	type=ID
+
+	name=ID
+	'('
+	    (params+=Parameter[','])?
+	')'
+;
+
+MethodWithoutType:
+	(visibility=Visibility)?
+	(access=Access)?
 	name=ID
 	'('
 	    (params+=Parameter[','])?

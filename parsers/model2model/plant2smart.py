@@ -93,9 +93,10 @@ def _add_types(plant, smart_model):
     for plant_class in plant.classes:
         smart_class = smart_model.classes[plant_class.name]
         for plant_at in plant_class.attributes:
-            if isinstance(plant_at,NAMES_SPACES['Value']):
+            if isinstance(plant_at,NAMES_SPACES['ValueWithType']):
                 smart_at = smart_class.attributes[plant_at.name]
-            else:
+                smart_at.type = _parse_type(plant_at.type, smart_model)
+            elif isinstance(plant_at,NAMES_SPACES['MethodWithType']) :
                 if plant_at.name == plant_class.name:
                     smart_at = smart_class.constructors[0]
                 else:
@@ -108,7 +109,7 @@ def _add_types(plant, smart_model):
                     else:
                         p_type = None
                     smart_param.type = p_type
-            smart_at.type = _parse_type(plant_at.type, smart_model)
+                smart_at.type = _parse_type(plant_at.type, smart_model)
 
 def _create_class( c, container):
     attributes = []
@@ -117,7 +118,7 @@ def _create_class( c, container):
         # type = _parse_type(at.type)
         visibility =_parse_visibility(at.visibility)
         access = _parse_access(at.access)
-        if isinstance(at,NAMES_SPACES['Value']):
+        if isinstance(at,NAMES_SPACES['ValueWithType']) or  isinstance(at,NAMES_SPACES['ValueWithoutType']):
             attributes.append(Attribute(name,
                                      visibility=visibility,
                                         access=access))
@@ -147,8 +148,11 @@ def _parse_type(_type, smart_model):
     if _type in parse.keys():
         return parse[_type]
     class_names = _make_class_names_dictionnary(smart_model)
+    enum_names = _make_enum_names_dictionnary(smart_model)
     if _type in class_names.keys():
         return class_names[_type]
+    elif _type in enum_names.keys():
+        return enum_names[_type]
     else:
         raise Exception('Unable to parse {} type'.format(_type))
 
@@ -159,7 +163,11 @@ def _make_class_names_dictionnary(pack):
         class_list += p.classes.items()
     return dict(class_list)
 
-    pass
+def _make_enum_names_dictionnary(pack):
+    enums_list = pack.enums.items()
+    for p in pack.packages:
+        enums_list += p.enums.items()
+    return dict(enums_list)
 
 def _parse_visibility(visibility):
     accessibitity = {"+":Visibility.public,

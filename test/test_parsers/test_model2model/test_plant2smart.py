@@ -191,7 +191,14 @@ class TestPlantUmlParsing(unittest.TestCase):
                     - str func1(float ina, B_type b)
 
                 }
-                class B_type
+                enum TimeUnit{
+                    DAYS
+                    HOURS
+                    MINUTES
+                }
+                class B_type{
+                    + TimeUnit get_couleur()
+                }
                 @enduml"""
         plant_uml_model = MM_PLANT.model_from_str(plant)
         smart_model = plant2smart(plant_uml_model)
@@ -200,6 +207,7 @@ class TestPlantUmlParsing(unittest.TestCase):
         self.assertEqual(class_A.attributes['attr1'].type, Type.int)
         self.assertEqual(class_A.methods['func1'].parameters[0].type, Type.float)
         self.assertEqual(class_A.methods['func1'].parameters[1].type, class_B)
+        self.assertEqual(class_B.methods['get_couleur'].type, smart_model.enums['TimeUnit'])
 
     def test_enums(self):
         plant = """
@@ -214,7 +222,6 @@ class TestPlantUmlParsing(unittest.TestCase):
                 enum EmptyEnum
                 package pac{
                     enum EnumInsidePac
-
                 }
 
                 @enduml"""

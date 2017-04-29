@@ -27,10 +27,10 @@ class TestPlantUmlGrammar(unittest.TestCase):
         self.assertEqual(len(class_A.attributes),2)
 
         attr1 = class_A.attributes[0]
-        self.assertTrue(isinstance(attr1, self.names_spaces['Value']))
+        self.assertTrue(isinstance(attr1, self.names_spaces['ValueWithoutType']))
 
         attr2 = class_A.attributes[1]
-        self.assertTrue(isinstance(attr2, self.names_spaces['Method']))
+        self.assertTrue(isinstance(attr2, self.names_spaces['MethodWithoutType']))
 
         class_B = plant_uml_model.classes[1]
         self.assertEqual(class_B.name, "B")
