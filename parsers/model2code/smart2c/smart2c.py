@@ -1,6 +1,9 @@
 from parsers.model2code.smart2c.c_class import CEnum, CClass
+
 from os.path import join, exists, dirname
 from os import makedirs
+from parsers.model2code.smart2c import makefile
+
 
 def pack2c(pack):
     for c in pack.classes.values():
@@ -22,6 +25,7 @@ def pack2c(pack):
         c.c_class.gen()
     for p in pack.packages:
         pack2c(p)
+
 
 def write_code(pack, output_path):
     for c in pack.classes.values():
@@ -46,13 +50,18 @@ def write_code(pack, output_path):
     for p in pack.packages:
         write_code(p, output_path)
 
+
+def _write_makefile(smart_model, output_path):
+    mf = makefile.gen(smart_model)
+    mf_path = join(output_path, 'Makefile')
+    with open(mf_path, 'w') as mfile:
+        mfile.write(mf)
+
+
 def smart2c(smart_model, output_path=None):
-    _classes = []
-    # for e in smart_model.enums.values():
-    #     self.gen_enums(e)
     pack2c(smart_model)
     write_code(smart_model, output_path)
-
+    _write_makefile(smart_model, output_path)
 
 
 def _find_enum_usage(enum, pack):

@@ -57,11 +57,6 @@ class CClass:
         self._gen_c_methods()
         self._gen_c_header()
 
-    def _gen_h_header(self):
-        header = '/*\n'
-        header += ' * {}\n'.format(self._h_file_name)
-        header += ' */\n\n'
-        self._h_file = header + self._h_file
 
     def _gen_c_header(self):
         header = '/*\n'
@@ -75,36 +70,13 @@ class CClass:
 
         self._c_file += '#include "{}"\n\n'.format(self._h_file_name)
 
-    def _gen_h_class_structure(self):
-        name = self._class.name
-        self._h_file += h_title('class structure')
-        self._h_file += 'typedef struct {}\n'.format(name)
-        self._h_file += '    {\n'
-
-        for m in self._class.methods.values():
-            self_param = 'struct {}*'.format(name)
-            params = ', '.join([self_param]+[_parse_type(p.type)+' '+p.name for p in m.parameters])
-            self._h_file += '        {}(*{}) ({});\n'.format(_parse_method_type(m), m.name, params)
-        self._h_file += '        void(*free)(struct {}*);\n'.format(name)
-
-        self._h_file += '    }} {};\n\n'.format(name)
-
-    def _gen_h_constructors(self):
-        # cons = self._class.constructors[0]
-        name = self._class.name
-        self._h_file += h_title('constructors')
-        self._h_file += '{} {}_create();\n'.format(name, name)
-        self._h_file += '{}* {}_new();\n\n'.format(name, name)
-        self._h_file += h_title('destructors')
-        self._h_file += 'void {}_free({} *self);\n'.format(name, name)
-        self._h_file += 'void {}_new_free({} *self);\n\n'.format(name, name)
 
     def _gen_c_constructors(self):
         # cons = self._class.constructors[0]
         name = self._class.name
 
         init_met_name = '{}_init'.format(name)
-        self._c_file += 'static {0}* {1}({0}*);\n\n'.format(name, init_met_name)
+        self._c_file += 'static void {1}({0}*);\n\n'.format(name, init_met_name)
         self._c_file += c_title('constructors')
         # gen create:
         self._c_file += '{} {}_create()\n'.format(name, name)
@@ -145,29 +117,73 @@ class CClass:
 
         pass
 
-    def _gen_h_methods(self):
-        self._h_file += h_title('methods')
-        for m in self._class.methods.values():
-            params = ', '.join([_parse_type(p.type)+' '+p.name for p in m.parameters])
-            method_name = '{}_{}'.format(self._class.name, m.name)
-            self._h_file += '{} {} ({});\n'.format(_parse_method_type(m), method_name, params)
 
     def _gen_c_methods(self):
-        self._c_file += c_title('methods')
+        if len(self._class.methods.values()):
+            self._c_file += c_title('methods')
         for m in self._class.methods.values():
             params = ', '.join([_parse_type(p.type)+' '+p.name for p in m.parameters])
             method_name = '{}_{}'.format(self._class.name,m.name)
             self._c_file += '{} {} ({})\n'.format(_parse_method_type(m), method_name, params)
             self._c_file += '{\n}\n\n'
 
+    def _gen_h_header(self):
+        header = '/*\n'
+        header += ' * {}\n'.format(self._h_file_name)
+        header += ' */\n\n'
+        self._h_file = header + self._h_file
+
+    def _gen_h_class_structure(self):
+        name = self._class.name
+        self._h_file += h_title('class structure')
+        self._h_file += 'typedef struct {}\n'.format(name)
+        self._h_file += '    {\n'
+
+        if len(self._class.methods.values()):
+            self._h_file += '        /* methods */\n'
+        for m in self._class.methods.values():
+            self_param = 'struct {}*'.format(name)
+            params = ', '.join([self_param]+[_parse_type(p.type)+' '+p.name for p in m.parameters])
+            self._h_file += '        {}(*{}) ({});\n'.format(_parse_method_type(m), m.name, params)
+
+        if len(self._class.attributes.values()):
+            self._h_file += '        /* attributes */\n'
+        for at in self._class.attributes.values():
+            self._h_file += '        {} {};\n'.format(_parse_attribute_type(at), at.name)
+
+
+        self._h_file += '        /* destructor */\n'
+        self._h_file += '        void(*free)(struct {}*);\n'.format(name)
+
+        self._h_file += '    }} {};\n\n'.format(name)
+
+    def _gen_h_constructors(self):
+        # cons = self._class.constructors[0]
+        name = self._class.name
+        self._h_file += h_title('constructors')
+        self._h_file += '{} {}_create();\n'.format(name, name)
+        self._h_file += '{}* {}_new();\n\n'.format(name, name)
+        self._h_file += h_title('destructors')
+        self._h_file += 'void {}_free({} *self);\n'.format(name, name)
+        self._h_file += 'void {}_new_free({} *self);\n\n'.format(name, name)
+
+
     def _gen_h_enums(self):
-        self._h_file += h_title('enumerations')
+        if len(self._c_enums):
+            self._h_file += h_title('enumerations')
         for e in self._c_enums:
             self._h_file += '{}'.format(e.h_file)
         self._h_file += '\n\n'
 
-    def add_enum(self, c_enum):
-        self._c_enums.append(c_enum)
+
+    def _gen_h_methods(self):
+        if len(self._class.methods.values()):
+            self._h_file += h_title('methods')
+        for m in self._class.methods.values():
+            params = ', '.join([_parse_type(p.type)+' '+p.name for p in m.parameters])
+            method_name = '{}_{}'.format(self._class.name, m.name)
+            self._h_file += '{} {} ({});\n'.format(_parse_method_type(m), method_name, params)
+
 
     def _gen_h_ifndef_file(self):
         name = '{}_H_'.format(self._class.name.upper())
@@ -178,6 +194,10 @@ class CClass:
 
     def _gen_h_ifdef_cpp_macro(self):
         self._h_file = IFDEF_CPP_MACRO_PATTERN.format(self._h_file)
+
+
+    def add_enum(self, c_enum):
+        self._c_enums.append(c_enum)
 
 class CEnum:
     def __init__(self, enum):
@@ -201,6 +221,12 @@ def _parse_method_type(m):
     t = m.type
     if t is None:
         warning('You should define a type for the method {}'.format(m.name))
+    return _parse_type(t)
+
+def _parse_attribute_type(at):
+    t = at.type
+    if t is None:
+        warning('You should define a type for the attribute {}'.format(at.name))
     return _parse_type(t)
 
 def _parse_type(t):

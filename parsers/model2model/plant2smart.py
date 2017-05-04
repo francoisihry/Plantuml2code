@@ -91,7 +91,7 @@ def _create_package(p):
 
 def _add_types(plant, smart_model):
     for plant_class in plant.classes:
-        smart_class = smart_model.classes[plant_class.name]
+        smart_class = plant_class.smart_class
         for plant_at in plant_class.attributes:
             if isinstance(plant_at,NAMES_SPACES['ValueWithType']):
                 smart_at = smart_class.attributes[plant_at.name]
@@ -110,6 +110,10 @@ def _add_types(plant, smart_model):
                         p_type = None
                     smart_param.type = p_type
                 smart_at.type = _parse_type(plant_at.type, smart_model)
+    for p in plant.packages:
+        _add_types(p, smart_model)
+
+
 
 def _create_class( c, container):
     attributes = []
@@ -129,9 +133,11 @@ def _create_class( c, container):
                                         access=access))
 
 
-    return Class(c.name,
+    smart_cl = Class(c.name,
                  attributes=attributes,
                  pack_container=container)
+    setattr(c, 'smart_class', smart_cl)
+    return smart_cl
 
 def _parse_type(_type, smart_model):
     parse = {"int":Type.int,
