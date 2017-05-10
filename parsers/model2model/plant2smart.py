@@ -127,7 +127,14 @@ def _create_class( c, container, smart_model):
                                      visibility=visibility,
                                         access=access))
         else:
-            params = [Parameter(p.name, _parse_type(p.type, smart_model)) for p in at.params]
+            params=[]
+            for p in at.params:
+                if isinstance(p,NAMES_SPACES['ParameterWithoutType']):
+                    p_type=None
+
+                else:
+                    p_type = p.type
+                params.append(Parameter(p.name, _parse_type(p_type, smart_model)))
             attributes.append(Method(name,  visibility=visibility,
                                      parameters=params,
                                         access=access))

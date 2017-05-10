@@ -2,6 +2,7 @@ from smart_model.attribute import Type
 from smart_model.model import Class, Enum
 from tools.warning import warning
 
+INDENT = '   '
 IFDEF_CPP_MACRO_PATTERN = '#ifdef __cplusplus\n' \
                        '    extern "C" {{\n' \
                        '#endif\n\n' \
@@ -74,64 +75,55 @@ class CClass:
     def _gen_c_constructors(self):
         # cons = self._class.constructors[0]
         name = self._class.name
-        if len(self._class.constructors):
-            cons = self._class.constructors[0]
-            cons_params = ', '.join([_parse_type(p.type) + ' ' + p.name for p in cons.parameters])
-            init_params = ', '.join(['{} *self'.format(name)]+[_parse_type(p.type) + ' ' +
-                                                               p.name for p in cons.parameters])
-            init_call_params = ', '.join([p.name for p in cons.parameters])
-        else:
-            cons_params = ''
-            init_params = '{} *self'.format(name)
-            init_call_params = ''
-        init_met_name = '{}_init'.format(name)
-        self._c_file += 'static void {}({});\n\n'.format(init_met_name, init_params)
-        self._c_file += c_title('constructors')
 
+        init_met_name = '{}_init'.format(name)
+        self._c_file += 'static void {1}({0}*);\n\n'.format(name, init_met_name)
+        self._c_file += c_title('constructors')
         # gen create:
-        self._c_file += '{0} {0}_create({1})\n'.format(name, cons_params)
+        self._c_file += '{} {}_create()\n'.format(name, name)
         self._c_file += '{\n'
-        self._c_file += '    {} self;\n'.format(name)
-        self._c_file += '    {}_init({});\n'.format(name, ', '.join(['&self', init_call_params]))
-        self._c_file += '    self.free = {}_free;\n'.format(name)
-        self._c_file += '    return self;\n'
+        self._c_file += INDENT + '{} self;\n'.format(name)
+        self._c_file += INDENT + '{}_init(&self);\n'.format(name)
+        self._c_file += INDENT + 'self.free = {}_free;\n'.format(name)
+        self._c_file += INDENT + 'return self;\n'
         self._c_file += '}\n\n'
         # gen new:
-        self._c_file += '{0}* {0}_new({1})\n'.format(name, cons_params)
+        self._c_file += '{}* {}_new()\n'.format(name, name)
         self._c_file += '{\n'
-        self._c_file += '    {} *self = malloc(sizeof({}));\n'.format(name, name)
-        self._c_file += '    if(!self) return NULL;\n'
-        self._c_file += '    {}_init({});\n'.format(name, ', '.join(['self', init_call_params]))
-        self._c_file += '    self->free = {}_new_free;\n'.format(name)
-        self._c_file += '    return self;\n'
+        self._c_file += INDENT + '{} *self = malloc(sizeof({}));\n'.format(name, name)
+        self._c_file += INDENT + 'if(!self) return NULL;\n'
+        self._c_file += INDENT + '{}_init(self);\n'.format(name)
+        self._c_file += INDENT + 'self->free = {}_new_free;\n'.format(name)
+        self._c_file += INDENT + 'return self;\n'
         self._c_file += '}\n\n'
-
         # gen init:
-        self._c_file += 'static void {}_init({})\n'.format(name, init_params)
+        self._c_file += 'static void {}_init({} *self)\n'.format(name, name)
         self._c_file += '{\n'
         for method_name in self._class.methods.keys():
-            self._c_file += '    self->{} = {}_{};\n'.format(method_name, name,method_name)
+            self._c_file += INDENT + 'self->{} = {}_{};\n'.format(method_name, name,method_name)
         self._c_file += '}\n\n'
         # gen destructors:
         self._c_file += c_title('destructors')
         self._c_file += 'void {}_free({} *self)\n'.format(name, name)
         self._c_file += '{\n'
-        self._c_file += '    /* should be completed considering what the class contains */\n'
+        self._c_file += INDENT + '/* should be completed considering what the class contains */\n'
         self._c_file += '}\n\n'
 
         self._c_file += 'void {}_new_free({} *self)\n'.format(name, name)
         self._c_file += '{\n'
-        self._c_file += '    if(self) {}_free(self);\n'.format(name)
-        self._c_file += '    free(self);\n'
+        self._c_file += INDENT + 'if(self) {}_free(self);\n'.format(name)
+        self._c_file += INDENT + 'free(self);\n'
         self._c_file += '}\n\n'
+
+
+        pass
 
 
     def _gen_c_methods(self):
         if len(self._class.methods.values()):
             self._c_file += c_title('methods')
-        cl_name = self._class.name
         for m in self._class.methods.values():
-            params = ', '.join(['{} *self'.format(cl_name)]+[_parse_type(p.type)+' '+p.name for p in m.parameters])
+            params = ', '.join([_parse_type(p.type)+' '+p.name for p in m.parameters])
             method_name = '{}_{}'.format(self._class.name,m.name)
             self._c_file += '{} {} ({})\n'.format(_parse_method_type(m), method_name, params)
             self._c_file += '{\n}\n\n'
@@ -146,37 +138,32 @@ class CClass:
         name = self._class.name
         self._h_file += h_title('class structure')
         self._h_file += 'typedef struct {}\n'.format(name)
-        self._h_file += '    {\n'
+        self._h_file += INDENT + '{\n'
 
         if len(self._class.methods.values()):
-            self._h_file += '        /* methods */\n'
+            self._h_file += INDENT + '/* methods */\n'
         for m in self._class.methods.values():
             self_param = 'struct {}*'.format(name)
-            params = ', '.join([self_param]+[_parse_type(p.type, name)+' '+p.name for p in m.parameters])
-            self._h_file += '        {}(*{}) ({});\n'.format(_parse_method_type(m, name), m.name, params)
+            params = ', '.join([self_param]+[_parse_type(p.type)+' '+p.name for p in m.parameters])
+            self._h_file += 2*INDENT + '{}(*{}) ({});\n'.format(_parse_method_type(m), m.name, params)
 
         if len(self._class.attributes.values()):
-            self._h_file += '        /* attributes */\n'
+            self._h_file += 2*INDENT + '/* attributes */\n'
         for at in self._class.attributes.values():
-            self._h_file += '        {} {};\n'.format(_parse_attribute_type(at, name), at.name)
+            self._h_file += 2*INDENT + '{} {};\n'.format(_parse_attribute_type(at), at.name)
 
 
-        self._h_file += '        /* destructor */\n'
-        self._h_file += '        void(*free)(struct {}*);\n'.format(name)
+        self._h_file += 2*INDENT + '/* destructor */\n'
+        self._h_file += 2*INDENT + 'void(*free)(struct {}*);\n'.format(name)
 
-        self._h_file += '    }} {};\n\n'.format(name)
+        self._h_file += INDENT + '}} {};\n\n'.format(name)
 
     def _gen_h_constructors(self):
         # cons = self._class.constructors[0]
         name = self._class.name
-        if len(self._class.constructors):
-            cons = self._class.constructors[0]
-            params = ', '.join([_parse_type(p.type)+' '+p.name for p in cons.parameters])
-        else:
-            params = ''
         self._h_file += h_title('constructors')
-        self._h_file += '{0} {0}_create({1});\n'.format(name, params)
-        self._h_file += '{0}* {0}_new({1});\n\n'.format(name, params)
+        self._h_file += '{} {}_create();\n'.format(name, name)
+        self._h_file += '{}* {}_new();\n\n'.format(name, name)
         self._h_file += h_title('destructors')
         self._h_file += 'void {}_free({} *self);\n'.format(name, name)
         self._h_file += 'void {}_new_free({} *self);\n\n'.format(name, name)
@@ -193,9 +180,8 @@ class CClass:
     def _gen_h_methods(self):
         if len(self._class.methods.values()):
             self._h_file += h_title('methods')
-        cl_name = self._class.name
         for m in self._class.methods.values():
-            params = ', '.join(['{} *self'.format(cl_name)]+[_parse_type(p.type)+' '+p.name for p in m.parameters])
+            params = ', '.join([_parse_type(p.type)+' '+p.name for p in m.parameters])
             method_name = '{}_{}'.format(self._class.name, m.name)
             self._h_file += '{} {} ({});\n'.format(_parse_method_type(m), method_name, params)
 
@@ -217,9 +203,9 @@ class CClass:
 class CEnum:
     def __init__(self, enum):
         self._enum = enum
-        labels = ',\n        '.join(enum.labels)
+        labels = ',\n{}'.format(2*INDENT).join(enum.labels)
         self.should_have_its_own_file = False
-        self._h_file = 'typedef enum \n    {{\n        {}\n    }} {} ;'.format(labels, enum.name)
+        self._h_file = 'typedef enum \n{0}{{\n{0}{0}{1}\n{0}}} {2} ;'.format(INDENT, labels, enum.name)
 
     @property
     def h_file(self):
@@ -232,22 +218,20 @@ class CEnum:
             header += ' */\n\n'
             return header + self._h_file
 
-def _parse_method_type(m, class_name = None):
+def _parse_method_type(m):
     t = m.type
     if t is None:
         warning('You should define a type for the method {}'.format(m.name))
-    return _parse_type(t, class_name)
+    return _parse_type(t)
 
-def _parse_attribute_type(at, class_name = None):
+def _parse_attribute_type(at):
     t = at.type
     if t is None:
         warning('You should define a type for the attribute {}'.format(at.name))
-    return _parse_type(t, class_name)
+    return _parse_type(t)
 
-def _parse_type(t, class_name = None):
+def _parse_type(t):
     if isinstance(t, Class) or isinstance(t, Enum):
-        if class_name is not None and t.name == class_name:
-            return 'struct {}'.format(t.name)
         return t.name
     parse = {
         Type.int: 'int',
