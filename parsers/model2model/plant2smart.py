@@ -11,11 +11,11 @@ NAMES_SPACES = MM_PLANT.namespaces['plant_uml_grammar']
 def plant2smart(plant):
     smart_model = SmartModel()
     for c in plant.classes:
-        smart_model.classes[c.name] = _create_class(c, None)
+        smart_model.classes[c.name] = _create_class(c, None, smart_model)
     for enum in plant.enums:
         smart_model.enums[enum.name] = Enum(enum.name, enum.labels)
     for p in plant.packages:
-        smart_model.packages.append(_create_package(p))
+        smart_model.packages.append(_create_package(p, smart_model))
     for r in plant.relations:
         _add_relation(r, smart_model)
     # add type : must be done at the end so that it can link to existing class
@@ -83,10 +83,10 @@ def _add_relation(rel, smart_model):
                                             label = label)
                                    )
 
-def _create_package(p):
-    classes = [_create_class(c, p ) for c in p.classes]
+def _create_package(p, smart_model):
+    classes = [_create_class(c, p , smart_model) for c in p.classes]
     enums = {e.name : Enum(e.name, e.labels) for e in p.enums}
-    packages = [_create_package(pack) for pack in p.packages]
+    packages = [_create_package(pack, smart_model) for pack in p.packages]
     return Package(p.path, classes, packages, enums=enums)
 
 def _add_types(plant, smart_model):
@@ -115,7 +115,7 @@ def _add_types(plant, smart_model):
 
 
 
-def _create_class( c, container):
+def _create_class( c, container, smart_model):
     attributes = []
     for at in c.attributes:
         name = at.name
@@ -127,7 +127,7 @@ def _create_class( c, container):
                                      visibility=visibility,
                                         access=access))
         else:
-            params = [Parameter(p.name) for p in at.params]
+            params = [Parameter(p.name, _parse_type(p.type, smart_model)) for p in at.params]
             attributes.append(Method(name,  visibility=visibility,
                                      parameters=params,
                                         access=access))
