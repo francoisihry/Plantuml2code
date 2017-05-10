@@ -1,7 +1,8 @@
 # plantuml2code
 This project aims to allow developpers to generate code from a Plant UML class diagramm.
 Languages curently supported :
-  - python
+  - Python
+  - C
 
 # How to use:
 
