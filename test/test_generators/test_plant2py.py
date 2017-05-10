@@ -38,8 +38,8 @@ class TestPlant2Py(unittest.TestCase):
                     Point 1..* --* 1 Segment
                     @enduml
         """
-        plant_file=join(dirname(__file__), join('data','diagram_1.tx','test_plant2py'))
+        plant_file=join(dirname(__file__), join('data','diagram_1.tx'))
         with open(plant_file, 'w') as file:
             file.write(plant)
-        plant2py(plant_file,join(dirname(__file__),'output'),
+        plant2py(plant_file,join(dirname(__file__),'output','test_plant2py'),
                  debug_enabled=False,todo_enabled=True)
