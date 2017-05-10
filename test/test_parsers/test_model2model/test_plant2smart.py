@@ -231,3 +231,21 @@ class TestPlantUmlParsing(unittest.TestCase):
         self.assertEqual(smart_model.enums['EmptyEnum'].name, 'EmptyEnum')
         self.assertEqual(smart_model.packages[0].enums['EnumInsidePac'].name, 'EnumInsidePac')
 
+    def test_constructor(self):
+        plant = """
+                @startuml
+                class Point{
+                    + Point(int x, int y)
+                }
+                @enduml"""
+        plant_uml_model = MM_PLANT.model_from_str(plant)
+        smart_model = plant2smart(plant_uml_model)
+        class_point = smart_model.classes['Point']
+        self.assertEqual(len(class_point.constructors),1)
+        constructor = class_point.constructors[0]
+        self.assertEqual(len(constructor.parameters), 2)
+        x_param = constructor.parameters[0]
+        self.assertEqual(x_param.name, 'x')
+        self.assertEqual(x_param.type, Type.int)
+
+

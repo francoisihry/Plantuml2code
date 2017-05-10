@@ -59,8 +59,18 @@ class TestPlantUmlGrammar(unittest.TestCase):
         self.assertEqual(packages[2].packages[0].path, ["inside", "pack"])
 
 
-    def test_attributes(self):
-        pass
+    def test_parameters(self):
+        plant = """
+                @startuml
+                class Point{
+                    + Point(int x, int y)
+                }
+                @enduml
+                """
+        plant_uml_model = self.meta_model.model_from_str(plant)
+        self.assertTrue(isinstance(plant_uml_model.classes[0].attributes[0], self.names_spaces['MethodWithoutType']))
+        self.assertTrue(isinstance(plant_uml_model.classes[0].attributes[0].params[0], self.names_spaces['ParameterWithType']))
+        self.assertEqual(plant_uml_model.classes[0].attributes[0].params[0].type, 'int')
 
     def test_relations(self):
         plant = """
