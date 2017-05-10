@@ -72,9 +72,11 @@ class CClass:
         self._gen_h_header()
 
         self._gen_c_incude()
-        self._gen_c_init()
+        self._gen_c_init_prototype()
         self._gen_c_v_table()
         self._gen_c_constructors()
+        self._gen_c_init()
+        self._gen_c_destructors()
         self._gen_c_methods()
         self._gen_c_header()
 
@@ -91,7 +93,7 @@ class CClass:
 
         self._c_file += '#include "{}"\n\n'.format(self._h_file_name)
 
-    def _gen_c_init(self):
+    def _gen_c_init_prototype(self):
         params = ', '.join([self._class.name+'*',self._h_constructor_params])
         init_met_name = '{}_init'.format(self._class.name)
         self._c_file += 'static void {0}({1});\n\n'.format(init_met_name, params)
@@ -134,26 +136,27 @@ class CClass:
         self._c_file += INDENT + '{}_init({});\n'.format(name, init_params_new)
         self._c_file += INDENT + 'return self;\n'
         self._c_file += '}\n\n'
-        # gen init:
-        self._c_file += 'static void {}_init({} *self)\n'.format(name, name)
+
+
+    def _gen_c_init(self):
+        params = ', '.join([self._class.name + ' *self', self._c_constructor_params])
+        self._c_file += 'static void {}_init({})\n'.format(self._class.name, params)
         self._c_file += '{\n'
         self._c_file += '}\n\n'
-        # gen destructors:
+
+
+    def _gen_c_destructors(self):
         self._c_file += c_title('destructors')
-        self._c_file += 'void {}({} *self)\n'.format(self._free_name, name)
+        self._c_file += 'void {}({} *self)\n'.format(self._free_name, self._class.name)
         self._c_file += '{\n'
         self._c_file += INDENT + '/* should be completed considering what the class contains */\n'
         self._c_file += '}\n\n'
 
-        self._c_file += 'void {}({} *self)\n'.format(self._free_new_name, name)
+        self._c_file += 'void {}({} *self)\n'.format(self._free_new_name, self._class.name)
         self._c_file += '{\n'
         self._c_file += INDENT + 'if(self) {}(self);\n'.format(self._free_name)
         self._c_file += INDENT + 'free(self);\n'
         self._c_file += '}\n\n'
-
-
-        pass
-
 
     def _gen_c_methods(self):
         if len(self._class.methods.values()):
@@ -183,7 +186,7 @@ class CClass:
 
 
         self._h_file += 2*INDENT + '/* virtual table */\n'
-        self._h_file += 2*INDENT + 'const struct {} *{});\n'.format(self._vtable_name, self._vtable_ref_name)
+        self._h_file += 2*INDENT + 'const struct {} *{};\n'.format(self._vtable_name, self._vtable_ref_name)
 
         self._h_file += INDENT + '}} {};\n\n'.format(name)
 
