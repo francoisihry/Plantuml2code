@@ -62,6 +62,7 @@ class CClass:
 
     def gen(self):
 
+        self._gen_h_include()
         self._gen_h_enums()
         self._gen_h_class_structure()
         self._gen_h_v_table()
@@ -172,6 +173,23 @@ class CClass:
         header += ' */\n\n'
         self._h_file = header + self._h_file
 
+    def _gen_h_include(self):
+        defined_enums_type = [e._enum for e in self._c_enums]
+        # si les type de fonction/attributs ou parametre sont definis dans un autre .h alors il faut l'inclure:
+        types_that_should_be_included = []
+        for at in self._class.attributes.values():
+            if at.type not in types_that_should_be_included and at.type not in defined_enums_type:
+                types_that_should_be_included.append(at.type)
+        for m in self._class.methods.values():
+            if m.type not in types_that_should_be_included and m.type not in defined_enums_type:
+                types_that_should_be_included.append(m.type)
+                for p in m.parameters:
+                    if p.type not in types_that_should_be_included and p.type not in defined_enums_type:
+                        types_that_should_be_included.append(p.type)
+            pass
+
+
+
     def _gen_h_class_structure(self):
         name = self._class.name
         self._h_file += h_title('class structure')
@@ -252,7 +270,6 @@ class CEnum:
     def __init__(self, enum):
         self._enum = enum
         labels = ',\n{}'.format(2*INDENT).join(enum.labels)
-        self.should_have_its_own_file = False
         self._h_file = 'typedef enum \n{0}{{\n{0}{0}{1}\n{0}}} {2} ;'.format(INDENT, labels, enum.name)
 
     @property

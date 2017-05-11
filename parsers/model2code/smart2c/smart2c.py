@@ -17,8 +17,8 @@ def pack2c(pack):
         if len(enum_usage) == 1:
             enum_usage[0].c_class.add_enum(c_enum)
         else:
-        # sinon si on indique qu'un fichier devra etre cree pour l'enum
-            c_enum.should_have_its_own_file = True
+        # sinon si on met le c_enum dans le package qui lui generera un .h
+            setattr(pack, 'c_enum', c_enum)
         # on associe la definition c de l'enum:
         setattr(e,'c_enum',CEnum(e))
     for c in pack.classes.values():

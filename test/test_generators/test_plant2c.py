@@ -24,6 +24,8 @@ package my.package{
                  debug_enabled=False,todo_enabled=True)
 
     def test_plant2c_2(self):
+        # Si un enum est utilise dans 2 classes, alors l'enum doit etre definis
+        # dans un .h et importé par les 2 classes
             plant = """
 @startuml
 
