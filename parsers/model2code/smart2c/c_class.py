@@ -1,6 +1,7 @@
 from smart_model.attribute import Type
 from smart_model.model import Class, Enum
 from tools.warning import warning
+from os.path import join
 
 INDENT = '   '
 IFDEF_CPP_MACRO_PATTERN = '#ifdef __cplusplus\n' \
@@ -17,14 +18,19 @@ def c_title(title):
 def h_title(title):
     return '/* {} */\n'.format(title)
 
+
+
+
 class CClass:
-    def __init__(self, cl):
+    def __init__(self, cl, smart_model):
+        self._smart_model = smart_model
         self._class = cl
         self._c_file = ''
         self._h_file = ''
         self._vtable_name = '_{}VirtualTable'.format(self._class.name)
         self._h_file_name = '{}.h'.format(cl.file_name)
         self._c_file_name = '{}.c'.format(cl.file_name)
+
         self._c_enums =[]
         if len(self._class.constructors)>0:
             self._h_constructor_params = ', '.join([_parse_param_type(p)
@@ -43,6 +49,29 @@ class CClass:
             method_name = '{}_{}'.format(self._class.name,m.name)
             setattr(m, 'c_name', method_name)
 
+    @staticmethod
+    def make_h_file_name(smart_class):
+        return  '{}.h'.format(smart_class.file_name)
+
+    @staticmethod
+    def make_c_file_name(smart_class):
+        return '{}.c'.format(smart_class.file_name)
+
+    @staticmethod
+    def make_h_path(smart_class):
+        return join(*(smart_class.path + [CClass.make_h_file_name(smart_class)]))
+
+    @staticmethod
+    def make_c_path(smart_class):
+        return join(*(smart_class.path + [CClass.make_c_file_name(smart_class)]))
+
+    @property
+    def path_h(self):
+        return self.make_h_path(self._class)
+
+    @property
+    def path_c(self):
+        return self.make_c_path(self._class)
 
     @property
     def c_file(self):
@@ -53,12 +82,8 @@ class CClass:
         return self._h_file
 
     @property
-    def h_file_name(self):
-        return self._h_file_name
-
-    @property
     def c_file_name(self):
-        return self._c_file_name
+        return self.make_c_file_name(self._class)
 
     def gen(self):
 
@@ -173,20 +198,67 @@ class CClass:
         header += ' */\n\n'
         self._h_file = header + self._h_file
 
+    @staticmethod
+    def _find_inclusion_needs(my_type, type_filter):
+        if not isinstance(my_type, Class):
+            return []
+        inlcusion_needs = []
+        for at in my_type.attributes.values():
+            if at.type not in inlcusion_needs and isinstance(at.type, type_filter):
+                inlcusion_needs.append(at.type)
+        for m in my_type.methods.values():
+            if m.type not in inlcusion_needs and isinstance(m.type, type_filter):
+                inlcusion_needs.append(m.type)
+                for p in m.parameters:
+                    if p.type not in inlcusion_needs and isinstance(p.type, type_filter):
+                        inlcusion_needs.append(p.type)
+        # si il s'inclut lui-meme on le retire des imports
+        inlcusion_needs = list(filter(lambda t: t != my_type, inlcusion_needs))
+        # on enleve aussi les enums qu'il definit dans son .h
+        # [inlcusion_needs.remove(e) for e in my_type.c_class._c_enums]
+        return inlcusion_needs
+
+    @staticmethod
+    def _find_more_heavy(inlcusion_weights):
+        more_heavy = list(inlcusion_weights.keys())[0]
+        for i in inlcusion_weights.keys():
+            if len(inlcusion_weights[i]) > len(inlcusion_weights[more_heavy]):
+                more_heavy = i
+        return more_heavy
+
+    @staticmethod
+    def find_enum_usage(pack, enum):
+        enum_usage = 0
+        for c in pack.classes:
+            enum_needs = CClass._find_inclusion_needs(c, Enum)
+            if enum in enum_needs:
+                enum_usage += 1
+        for p in pack.packages:
+            enum_usage += CClass.find_enum_usage(p, enum)
+        return enum_usage
+
     def _gen_h_include(self):
         defined_enums_type = [e._enum for e in self._c_enums]
         # si les type de fonction/attributs ou parametre sont definis dans un autre .h alors il faut l'inclure:
-        types_that_should_be_included = []
-        for at in self._class.attributes.values():
-            if at.type not in types_that_should_be_included and at.type not in defined_enums_type:
-                types_that_should_be_included.append(at.type)
-        for m in self._class.methods.values():
-            if m.type not in types_that_should_be_included and m.type not in defined_enums_type:
-                types_that_should_be_included.append(m.type)
-                for p in m.parameters:
-                    if p.type not in types_that_should_be_included and p.type not in defined_enums_type:
-                        types_that_should_be_included.append(p.type)
-            pass
+        class_inlcusion_needs = self._find_inclusion_needs(self._class, Class)
+        inclusions = []
+        while len(class_inlcusion_needs):
+            inlcusion_weights ={i:self._find_inclusion_needs(i, Class) for i in class_inlcusion_needs }
+            more_heavy = self._find_more_heavy(inlcusion_weights)
+            inclusions.append(more_heavy)
+            e = inlcusion_weights[more_heavy]
+            for i in inlcusion_weights[more_heavy]:
+                if i in class_inlcusion_needs:
+                    class_inlcusion_needs.remove(i)
+            class_inlcusion_needs.remove(more_heavy)
+        # Now we include all the .h of the classes contained in inclusions
+        for c in inclusions:
+            self._h_file += '#include "{}"\n'.format(self.make_h_path(c))
+        enum_inlcusion_needs = self._find_inclusion_needs(self._class, Enum)
+        if len(enum_inlcusion_needs):
+            for e in enum_inlcusion_needs:
+                usage = self.find_enum_usage(self._smart_model, e)
+                i=0
 
 
 
@@ -274,10 +346,7 @@ class CEnum:
 
     @property
     def h_file(self):
-        if not self.should_have_its_own_file:
-            return self._h_file
-        else:
-            file_name = 'enum_{}.h'.format(self.name)
+            file_name = 'enum_{}.h'.format(self._enum.name)
             header = '/*\n'
             header += ' * {}\n'.format(file_name)
             header += ' */\n\n'

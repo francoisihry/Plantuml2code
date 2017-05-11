@@ -5,9 +5,9 @@ from os import makedirs
 from parsers.model2code.smart2c import makefile
 
 
-def pack2c(pack):
+def pack2c(pack, smart_model):
     for c in pack.classes.values():
-        setattr(c,'c_class',CClass(c))
+        setattr(c,'c_class',CClass(c, smart_model))
     for e in pack.enums.values():
         c_enum = CEnum(e)
         enum_usage = _find_enum_usage(e, pack)
@@ -24,19 +24,13 @@ def pack2c(pack):
     for c in pack.classes.values():
         c.c_class.gen()
     for p in pack.packages:
-        pack2c(p)
+        pack2c(p, smart_model)
 
 
 def write_code(pack, output_path):
     for c in pack.classes.values():
-        if len(c.path):
-            c_path = join(output_path, join(*(c.path))
-                          , c.c_class.c_file_name)
-            h_path = join(output_path, join(*(c.path))
-                          , c.c_class.h_file_name)
-        else:
-            c_path = join(output_path, c.c_class.c_file_name)
-            h_path = join(output_path, c.c_class.h_file_name)
+        c_path = join(output_path, c.c_class.path_c)
+        h_path = join(output_path, c.c_class.path_h)
         c_dir = dirname(c_path)
         if not exists(c_dir):
             makedirs(c_dir)
@@ -59,7 +53,7 @@ def _write_makefile(smart_model, output_path):
 
 
 def smart2c(smart_model, output_path=None):
-    pack2c(smart_model)
+    pack2c(smart_model, smart_model)
     write_code(smart_model, output_path)
     _write_makefile(smart_model, output_path)
 
