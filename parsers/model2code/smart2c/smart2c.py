@@ -28,6 +28,7 @@ def pack2c(pack, smart_model):
 
 
 def write_code(pack, output_path):
+    # writting classes:
     for c in pack.classes.values():
         c_path = join(output_path, c.c_class.path_c)
         h_path = join(output_path, c.c_class.path_h)
@@ -41,6 +42,14 @@ def write_code(pack, output_path):
             makedirs(h_dir)
         with open(h_path, 'w') as h_file:
             h_file.write(c.c_class.h_file)
+    # writting enums:
+    for e in pack.enums.values():
+        h_path = join(output_path, e.c_enum.path_h)
+        h_dir = dirname(h_path)
+        if not exists(h_dir):
+            makedirs(h_dir)
+        with open(h_path, 'w') as h_file:
+            h_file.write(e.c_enum.h_file)
     for p in pack.packages:
         write_code(p, output_path)
 

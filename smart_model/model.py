@@ -16,6 +16,7 @@ class SmartModel:
             self._enums = enums
         else:
             self._enums ={}
+        self.path=[]
 
 
     @property
@@ -58,9 +59,11 @@ class SmartModel:
 
 
 class Enum:
-    def __init__(self, name, labels):
+    def __init__(self, name, labels, pack_container):
         self._name = name
         self._labels = labels
+        self._pack_container = pack_container
+        self._file_name = to_snake_case(name)
 
     @property
     def labels(self):
@@ -69,6 +72,26 @@ class Enum:
     @property
     def name(self):
         return self._name
+
+    @property
+    def pack_container(self):
+        return self._pack_container
+
+    @pack_container.setter
+    def pack_container(self, c):
+        self._pack_container = c
+
+    @property
+    def path(self):
+        if self.pack_container:
+            path = self.pack_container.path
+        else:
+            path=[]
+        return path
+
+    @property
+    def file_name(self):
+        return self._file_name
 
 
 

@@ -229,7 +229,7 @@ class CClass:
     @staticmethod
     def find_enum_usage(pack, enum):
         enum_usage = 0
-        for c in pack.classes:
+        for c in pack.classes.values():
             enum_needs = CClass._find_inclusion_needs(c, Enum)
             if enum in enum_needs:
                 enum_usage += 1
@@ -258,7 +258,8 @@ class CClass:
         if len(enum_inlcusion_needs):
             for e in enum_inlcusion_needs:
                 usage = self.find_enum_usage(self._smart_model, e)
-                i=0
+                if usage > 1:
+                    self._h_file += '#include "{}"\n'.format(self.make_h_path(e))
 
 
 
@@ -343,6 +344,11 @@ class CEnum:
         self._enum = enum
         labels = ',\n{}'.format(2*INDENT).join(enum.labels)
         self._h_file = 'typedef enum \n{0}{{\n{0}{0}{1}\n{0}}} {2} ;'.format(INDENT, labels, enum.name)
+
+
+    @property
+    def path_h(self):
+        return CClass.make_h_path(self._enum)
 
     @property
     def h_file(self):

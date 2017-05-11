@@ -13,7 +13,7 @@ def plant2smart(plant):
     for c in plant.classes:
         smart_model.classes[c.name] = _create_class(c, None, smart_model)
     for enum in plant.enums:
-        smart_model.enums[enum.name] = Enum(enum.name, enum.labels)
+        smart_model.enums[enum.name] = Enum(enum.name, enum.labels,smart_model)
     for p in plant.packages:
         smart_model.packages.append(_create_package(p, smart_model))
     for r in plant.relations:
