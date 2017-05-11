@@ -59,7 +59,7 @@ class SmartModel:
 
 
 class Enum:
-    def __init__(self, name, labels, pack_container):
+    def __init__(self, name, labels, pack_container=None):
         self._name = name
         self._labels = labels
         self._pack_container = pack_container

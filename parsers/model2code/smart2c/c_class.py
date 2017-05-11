@@ -226,16 +226,16 @@ class CClass:
                 more_heavy = i
         return more_heavy
 
-    @staticmethod
-    def find_enum_usage(pack, enum):
-        enum_usage = 0
-        for c in pack.classes.values():
-            enum_needs = CClass._find_inclusion_needs(c, Enum)
-            if enum in enum_needs:
-                enum_usage += 1
-        for p in pack.packages:
-            enum_usage += CClass.find_enum_usage(p, enum)
-        return enum_usage
+    # @staticmethod
+    # def find_enum_usage(pack, enum):
+    #     enum_usage = 0
+    #     for c in pack.classes.values():
+    #         enum_needs = CClass._find_inclusion_needs(c, Enum)
+    #         if enum in enum_needs:
+    #             enum_usage += 1
+    #     for p in pack.packages:
+    #         enum_usage += CClass.find_enum_usage(p, enum)
+    #     return enum_usage
 
     def _gen_h_include(self):
         defined_enums_type = [e._enum for e in self._c_enums]
@@ -254,12 +254,9 @@ class CClass:
         # Now we include all the .h of the classes contained in inclusions
         for c in inclusions:
             self._h_file += '#include "{}"\n'.format(self.make_h_path(c))
-        enum_inlcusion_needs = self._find_inclusion_needs(self._class, Enum)
-        if len(enum_inlcusion_needs):
-            for e in enum_inlcusion_needs:
-                usage = self.find_enum_usage(self._smart_model, e)
-                if usage > 1:
-                    self._h_file += '#include "{}"\n'.format(self.make_h_path(e))
+        enum = [e for e in self._c_enums if e.should_have_its_own_file]
+        for e in enum:
+                self._h_file += '#include "{}"\n'.format(self.make_h_path(e._enum))
 
 
 
@@ -310,10 +307,11 @@ class CClass:
 
 
     def _gen_h_enums(self):
-        if len(self._c_enums):
+        enums = [e for e in self._c_enums if not e.should_have_its_own_file]
+        if len(enums):
             self._h_file += h_title('enumerations')
-            for e in self._c_enums:
-                self._h_file += '{}'.format(e.h_file)
+        for e in enums:
+            self._h_file += '{}'.format(e.h_file)
             self._h_file += '\n\n'
 
 
@@ -344,6 +342,15 @@ class CEnum:
         self._enum = enum
         labels = ',\n{}'.format(2*INDENT).join(enum.labels)
         self._h_file = 'typedef enum \n{0}{{\n{0}{0}{1}\n{0}}} {2} ;'.format(INDENT, labels, enum.name)
+        self._should_have_its_own_file = False
+
+    @property
+    def should_have_its_own_file(self):
+        return self._should_have_its_own_file
+
+    @should_have_its_own_file.setter
+    def should_have_its_own_file(self, b):
+        self._should_have_its_own_file = b
 
 
     @property
