@@ -85,7 +85,7 @@ def _add_relation(rel, smart_model):
 
 def _create_package(p, smart_model):
     classes = [_create_class(c, p , smart_model) for c in p.classes]
-    enums = {e.name : Enum(e.name, e.labels) for e in p.enums}
+    enums = {e.name : Enum(e.name, e.labels, p) for e in p.enums}
     packages = [_create_package(pack, smart_model) for pack in p.packages]
     return Package(p.path, classes, packages, enums=enums)
 
