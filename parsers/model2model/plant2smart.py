@@ -173,7 +173,7 @@ def _make_class_names_dictionnary(pack):
     return dict(class_list)
 
 def _make_enum_names_dictionnary(pack):
-    enums = pack.enums
+    enums = {e:pack.enums[e] for e in pack.enums.keys()}
     for p in pack.packages:
         for e in p.enums.keys():
             enums[e] = p.enums[e]
