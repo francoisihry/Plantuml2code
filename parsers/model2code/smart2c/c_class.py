@@ -226,16 +226,6 @@ class CClass:
                 more_heavy = i
         return more_heavy
 
-    # @staticmethod
-    # def find_enum_usage(pack, enum):
-    #     enum_usage = 0
-    #     for c in pack.classes.values():
-    #         enum_needs = CClass._find_inclusion_needs(c, Enum)
-    #         if enum in enum_needs:
-    #             enum_usage += 1
-    #     for p in pack.packages:
-    #         enum_usage += CClass.find_enum_usage(p, enum)
-    #     return enum_usage
 
     def _gen_h_include(self):
         defined_enums_type = [e._enum for e in self._c_enums]
