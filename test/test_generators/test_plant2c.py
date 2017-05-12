@@ -64,10 +64,12 @@ class G
             plant = """
 @startuml
 
-enum TimeUnit {
-  DAYS
-  HOURS
-  MINUTES
+package my_pack{
+    enum TimeUnit {
+      DAYS
+      HOURS
+      MINUTES
+    }
 }
 
 class A{

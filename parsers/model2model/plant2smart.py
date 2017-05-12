@@ -156,12 +156,12 @@ def _parse_type(_type, smart_model):
                   }
     if _type in parse.keys():
         return parse[_type]
-    class_names = _make_class_names_dictionnary(smart_model)
     enum_names = _make_enum_names_dictionnary(smart_model)
+    if _type in enum_names.keys():
+        return enum_names[_type]
+    class_names = _make_class_names_dictionnary(smart_model)
     if _type in class_names.keys():
         return class_names[_type]
-    elif _type in enum_names.keys():
-        return enum_names[_type]
     else:
         raise Exception('Unable to parse {} type'.format(_type))
 
@@ -173,10 +173,11 @@ def _make_class_names_dictionnary(pack):
     return dict(class_list)
 
 def _make_enum_names_dictionnary(pack):
-    enums_list = pack.enums.items()
+    enums = pack.enums
     for p in pack.packages:
-        enums_list += p.enums.items()
-    return dict(enums_list)
+        for e in p.enums.keys():
+            enums[e] = p.enums[e]
+    return enums
 
 def _parse_visibility(visibility):
     accessibitity = {"+":Visibility.public,

@@ -15,7 +15,6 @@ def enum_ref(pack, smart_model):
     for e in pack.enums.values():
         c_enum = CEnum(e)
         enum_usage = _find_enum_usage(smart_model, e)
-        i=0
         # si l'enum est utilisé dans une seule classe, alors on le déclare
         # dans le .h  de la classe
         if len(enum_usage) == 1:
@@ -81,18 +80,6 @@ def smart2c(smart_model, output_path=None):
     _write_makefile(smart_model, output_path)
 
 
-# def _find_enum_usage(enum, pack):
-#     usage=[]
-#     for c in pack.classes.values():
-#         class_attr = list(c.methods.values())+ list(c.attributes.values())
-#         at_usage = [at for at in class_attr if at.type == enum]
-#         if len(at_usage)>0 :
-#             usage.append(c)
-#     for p in pack.packages:
-#         usage += _find_enum_usage(enum, p)
-#     return usage
-
-
 def _find_enum_usage(pack, enum):
     enum_usage = []
     for c in pack.classes.values():
@@ -100,7 +87,7 @@ def _find_enum_usage(pack, enum):
         if enum in enum_needs and c not in enum_usage:
             enum_usage.append(c)
     for p in pack.packages:
-        enum_usage += CClass.find_enum_usage(p, enum)
+        enum_usage += _find_enum_usage(p, enum)
     return enum_usage
 
 
