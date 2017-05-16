@@ -33,13 +33,18 @@ class CClass:
 
         self._c_enums =[]
         if len(self._class.constructors)>0:
-            self._h_constructor_params = ', '.join([_parse_param_type(p)
-                                        for p in self._class.constructors[0].parameters])
-            self._c_constructor_params = ', '.join([_parse_param_type(p) + ' ' + p.name
-                                                    for p in self._class.constructors[0].parameters])
+            _param_proto = [_parse_param_type(p) for p in self._class.constructors[0].parameters]
+            _param_func = [_parse_param_type(p) + ' ' + p.name for p in self._class.constructors[0].parameters]
+            self._h_constructor_params = ', '.join(_param_proto)
+            self._c_constructor_params = ', '.join(_param_func)
+            self._init_proto = ', '.join([self._class.name+'*']+_param_proto)
+            self._init_func = ', '.join([self._class.name + ' *self']+_param_func)
+
         else :
             self._h_constructor_params = ''
             self._c_constructor_params = ''
+            self._init_proto = self._class.name + '*'
+            self._init_func = self._class.name + ' *self'
         self._c_vtable_inst_name = 'VTABLE'
         self._vtable_ref_name = 'vtable'
         self._vtable_name = self._class.name.lower() + '_vtable_t'
@@ -120,9 +125,9 @@ class CClass:
         self._c_file += '#include "{}"\n\n'.format(self._h_file_name)
 
     def _gen_c_init_prototype(self):
-        params = ', '.join([self._class.name+'*',self._h_constructor_params])
+
         init_met_name = '{}_init'.format(self._class.name)
-        self._c_file += 'static void {0}({1});\n\n'.format(init_met_name, params)
+        self._c_file += 'static void {0}({1});\n\n'.format(init_met_name, self._init_proto)
 
 
     def _gen_c_v_table(self):
@@ -165,8 +170,7 @@ class CClass:
 
 
     def _gen_c_init(self):
-        params = ', '.join([self._class.name + ' *self', self._c_constructor_params])
-        self._c_file += 'static void {}_init({})\n'.format(self._class.name, params)
+        self._c_file += 'static void {}_init({})\n'.format(self._class.name, self._init_func)
         self._c_file += '{\n'
         self._c_file += '}\n\n'
 

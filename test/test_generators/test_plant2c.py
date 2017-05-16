@@ -4,6 +4,7 @@ from generators.plant2c import plant2c
 from os.path import join, dirname, exists
 
 
+
 class TestPlant2C(unittest.TestCase):
 
     def test_plant2c(self):
@@ -24,8 +25,6 @@ package my.package{
                  debug_enabled=False,todo_enabled=True)
 
     def test_plant2c_2(self):
-        # Si un enum est utilise dans 2 classes, alors l'enum doit etre definis
-        # dans un .h et importé par les 2 classes
         plant = """
 @startuml
 class A{
@@ -88,7 +87,17 @@ class B{
             plant2c(plant_file, join(dirname(__file__), 'output','test_plant2c_3'),
                     debug_enabled=False, todo_enabled=True)
             self.assertTrue(exists(join(dirname(__file__), 'output','test_plant2c_3', 'a.c')))
-            self.assertTrue(exists(join(dirname(__file__), 'output', 'test_plant2c_3', 'a.h')))
+            a_h_path = join(dirname(__file__), 'output', 'test_plant2c_3', 'a.h')
+            self.assertTrue(exists(a_h_path))
             self.assertTrue(exists(join(dirname(__file__), 'output', 'test_plant2c_3', 'b.c')))
-            self.assertTrue(exists(join(dirname(__file__), 'output', 'test_plant2c_3', 'b.h')))
+            b_h_path = join(dirname(__file__), 'output', 'test_plant2c_3', 'b.h')
+            self.assertTrue(exists(b_h_path))
             self.assertTrue(exists(join(dirname(__file__), 'output', 'test_plant2c_3', 'my_pack', 'time_unit.h')))
+
+            # we check that a and b include the time_unit.h:
+            enum_include = '#include "{}"'.format(join('my_pack', 'time_unit.h'))
+            with open(a_h_path, 'r') as a_h_file:
+                self.assertTrue(enum_include in a_h_file.read())
+            with open(b_h_path, 'r') as b_h_file:
+                self.assertTrue(enum_include in b_h_file.read())
+
