@@ -1,7 +1,7 @@
 import unittest
 
 from generators.plant2c import plant2c
-from os.path import join, dirname
+from os.path import join, dirname, exists
 
 
 class TestPlant2C(unittest.TestCase):
@@ -87,3 +87,8 @@ class B{
                 file.write(plant)
             plant2c(plant_file, join(dirname(__file__), 'output','test_plant2c_3'),
                     debug_enabled=False, todo_enabled=True)
+            self.assertTrue(exists(join(dirname(__file__), 'output','test_plant2c_3', 'a.c')))
+            self.assertTrue(exists(join(dirname(__file__), 'output', 'test_plant2c_3', 'a.h')))
+            self.assertTrue(exists(join(dirname(__file__), 'output', 'test_plant2c_3', 'b.c')))
+            self.assertTrue(exists(join(dirname(__file__), 'output', 'test_plant2c_3', 'b.h')))
+            self.assertTrue(exists(join(dirname(__file__), 'output', 'test_plant2c_3', 'my_pack', 'time_unit.h')))
