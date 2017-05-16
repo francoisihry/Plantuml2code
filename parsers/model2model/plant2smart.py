@@ -152,7 +152,7 @@ def _parse_type(_type, smart_model):
                   "String" : Type.string,
                   "void" : Type.void,
                   "Void" : Type.void,
-                  None:None
+                  '':None
                   }
     if _type in parse.keys():
         return parse[_type]

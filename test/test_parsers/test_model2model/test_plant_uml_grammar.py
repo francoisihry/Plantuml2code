@@ -63,14 +63,15 @@ class TestPlantUmlGrammar(unittest.TestCase):
         plant = """
                 @startuml
                 class Point{
-                    + Point(int x, int y)
+                    + Point(int x, y)
                 }
                 @enduml
                 """
         plant_uml_model = self.meta_model.model_from_str(plant)
         self.assertTrue(isinstance(plant_uml_model.classes[0].attributes[0], self.names_spaces['MethodWithoutType']))
-        self.assertTrue(isinstance(plant_uml_model.classes[0].attributes[0].params[0], self.names_spaces['ParameterWithType']))
+        self.assertTrue(isinstance(plant_uml_model.classes[0].attributes[0].params[0], self.names_spaces['Parameter']))
         self.assertEqual(plant_uml_model.classes[0].attributes[0].params[0].type, 'int')
+        self.assertEqual(plant_uml_model.classes[0].attributes[0].params[1].type, '')
 
     def test_relations(self):
         plant = """

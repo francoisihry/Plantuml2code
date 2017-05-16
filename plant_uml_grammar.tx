@@ -69,11 +69,9 @@ ValueWithoutType:
 ;
 
 Parameter:
-    ParameterWithType | ParameterWithoutType
+    type=ID name=ID | name=ID
 ;
 
-ParameterWithType: type=ID name=ID;
-ParameterWithoutType: name=ID;
 
 Method:
 	MethodWithType|MethodWithoutType
