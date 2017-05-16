@@ -132,7 +132,7 @@ class CClass:
 
     def _gen_c_v_table(self):
         self._c_file += c_title('virtual table')
-        self._c_file += '{} {} = {{\n'.format(self._vtable_name, self._c_vtable_inst_name)
+        self._c_file += 'static {} {} = {{\n'.format(self._vtable_name, self._c_vtable_inst_name)
         self._c_file += INDENT + self._free_name+',\n'
         for m in self._class.methods.values():
             self._c_file += INDENT + '{},\n'.format(m.c_name)
