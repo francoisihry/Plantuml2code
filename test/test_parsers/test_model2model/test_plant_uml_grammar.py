@@ -92,7 +92,7 @@ class TestPlantUmlGrammar(unittest.TestCase):
         compo = plant_uml_model.relations[0]
         figure = plant_uml_model.classes[1]
         self.assertTrue(isinstance(compo, self.names_spaces['Composition']))
-        contenu = compo.contenu[0]
+        contenu = compo.contenu
         self.assertEqual(contenu, point)
-        contenant = compo.contenant [0]
+        contenant = compo.contenant
         self.assertEqual(contenant, figure)

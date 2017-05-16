@@ -25,7 +25,7 @@ def plant2smart(plant):
 
 class Range:
     def __init__(self, plant_range):
-        if len(plant_range):
+        if plant_range is not None:
             plant_range = plant_range[0]
             if len(plant_range) == 1:
                 parsed = self._parse(plant_range[0])
@@ -50,8 +50,8 @@ class Range:
 
 
 def _add_relation(rel, smart_model):
-        contenu = rel.contenu[0]
-        contenant = rel.contenant[0]
+        contenu = rel.contenu
+        contenant = rel.contenant
         class_contenu_range = Range(rel.range_contenu)
         class_contenant_range = Range(rel.range_contenant)
         match_contenu = smart_model.find_classes_by_name(contenu.name)
