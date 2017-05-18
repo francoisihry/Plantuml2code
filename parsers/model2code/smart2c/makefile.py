@@ -1,7 +1,8 @@
 from os.path import join
 
+
 def _gen_src(pack):
-    src_paths = ''
+    src_paths = []
     for c in pack.classes.values():
         if len(c.path):
             src_path = join(join(*(c.path))
@@ -9,14 +10,14 @@ def _gen_src(pack):
 
         else:
             src_path = join(c.c_class.c_file_name)
-        src_paths += "\ " \
-                     "\n    {}".format(src_path)
+        src_paths .append(src_path)
     for p in pack.packages:
         src_paths += _gen_src(p)
     return src_paths
 
+
 def gen(smart_model):
-    src_paths = _gen_src(smart_model)
+    src_paths = '\\\n'.join(_gen_src(smart_model))
     make_file = """
 CC=gcc
 CFLAGS=-W -Wall -ansi -pedantic

@@ -45,7 +45,8 @@ class CClass:
             self._c_constructor_params = ''
             self._init_proto = self._class.name + '*'
             self._init_func = self._class.name + ' *self'
-        self._c_vtable_inst_name = 'VTABLE'
+        self._c_vtable_create_name = 'VTABLE_CREATE'
+        self._c_vtable_new_name = 'VTABLE_NEW'
         self._vtable_ref_name = 'vtable'
         self._vtable_name = self._class.name.lower() + '_vtable_t'
         self._free_name = self._class.name+'_free'
@@ -132,11 +133,18 @@ class CClass:
 
     def _gen_c_v_table(self):
         self._c_file += c_title('virtual table')
-        self._c_file += 'static {} {} = {{\n'.format(self._vtable_name, self._c_vtable_inst_name)
+        self._c_file += 'static {} {} = {{\n'.format(self._vtable_name, self._c_vtable_create_name)
         self._c_file += INDENT + self._free_name+',\n'
         for m in self._class.methods.values():
             self._c_file += INDENT + '{},\n'.format(m.c_name)
         self._c_file += '};\n\n'
+
+        self._c_file += 'static {} {} = {{\n'.format(self._vtable_name, self._c_vtable_new_name)
+        self._c_file += INDENT + self._free_new_name + ',\n'
+        for m in self._class.methods.values():
+            self._c_file += INDENT + '{},\n'.format(m.c_name)
+        self._c_file += '};\n\n'
+
 
 
     def _gen_c_constructors(self):
@@ -152,7 +160,7 @@ class CClass:
         self._c_file += '{0} {0}_create({1})\n'.format(name, self._c_constructor_params)
         self._c_file += '{\n'
         self._c_file += INDENT + '{} self;\n'.format(name)
-        self._c_file += INDENT + 'self.{} =  &{};\n'.format(self._vtable_ref_name, self._c_vtable_inst_name)
+        self._c_file += INDENT + 'self.{} =  &{};\n'.format(self._vtable_ref_name, self._c_vtable_create_name)
         self._c_file += INDENT + '{}_init({});\n'.format(name, init_params_create)
         self._c_file += INDENT + 'return self;\n'
         self._c_file += '}\n\n'
@@ -161,8 +169,7 @@ class CClass:
         self._c_file += '{\n'
         self._c_file += INDENT + '{} *self = malloc(sizeof({}));\n'.format(name, name)
         self._c_file += INDENT + 'if(!self) return NULL;\n'
-        self._c_file += INDENT + '{}.destroy = {};\n'.format(self._c_vtable_inst_name, self._free_new_name)
-        self._c_file += INDENT + 'self->{} =  &{};\n'.format(self._vtable_ref_name, self._c_vtable_inst_name)
+        self._c_file += INDENT + 'self->{} =  &{};\n'.format(self._vtable_ref_name, self._c_vtable_new_name)
 
         self._c_file += INDENT + '{}_init({});\n'.format(name, init_params_new)
         self._c_file += INDENT + 'return self;\n'

@@ -101,3 +101,45 @@ class B{
             with open(b_h_path, 'r') as b_h_file:
                 self.assertTrue(enum_include in b_h_file.read())
 
+    def test_plant2c_4(self):
+        # Si un enum est utilise dans 2 classes, alors l'enum doit etre definis
+        # dans un .h et importé par les 2 classes
+            plant = """
+@startuml
+class chien{
+    + void aboyer()
+}
+@enduml
+            """
+            plant_file = join(dirname(__file__), join('data', 'c_test_4.tx'))
+            with open(plant_file, 'w') as file:
+                file.write(plant)
+            plant2c(plant_file, join(dirname(__file__), 'output','test_plant2c_4'),
+                    debug_enabled=False, todo_enabled=True)
+            chien_c_path = join(dirname(__file__), 'output', 'test_plant2c_4', 'chien.c')
+            self.assertTrue(exists(chien_c_path))
+            main_c_path = join(dirname(__file__), 'output', 'test_plant2c_4', 'main.c')
+            main_c = """
+#include <stdlib.h>
+#include<stdio.h>
+
+#include "animaux/chien.h"
+#include "animaux/chat.h"
+#include "animaux/animal.h"
+
+int main()
+{
+    chien toutou = chien_create();
+    toutou.vtable->aboyer(&toutou);
+    chien* medord = chien_new();
+    medord->vtable->aboyer(medord);
+    toutou.vtable->destroy(&toutou);
+    medord->vtable->destroy(medord);
+    return 0;
+}
+            """
+            with open(main_c_path, 'w') as file:
+                file.write(main_c)
+
+
+
