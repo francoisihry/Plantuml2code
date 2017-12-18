@@ -30,7 +30,4 @@ Mandatory arguments to long options are mandatory for short options too.
   -d, --debug           enable debug
       --disable-todo    disable todo indications
 ```
-# Feedbacks:
 
-Interested in that project ? You found a bug ? An improvement idea ?
-Please feel free to contact me: francois.ihry@gmail.com
