@@ -34,4 +34,4 @@ Mandatory arguments to long options are mandatory for short options too.
 # Dependencies:
 
 * Python3
-* TexT 1.6 (current version not supported) : pip3 install textx==1.6
+* TexT 1.6 (current version not supported) : ```pip3 install textx==1.6```
