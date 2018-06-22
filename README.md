@@ -31,3 +31,7 @@ Mandatory arguments to long options are mandatory for short options too.
       --disable-todo    disable todo indications
 ```
 
+# Dependencies:
+
+* Python3
+* TexT 1.6 (current version not supported) : pip3 install textx==1.6
